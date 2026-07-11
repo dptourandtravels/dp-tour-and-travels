@@ -15,6 +15,7 @@ export default function DealerStockRequests({ loaderData }: Route.ComponentProps
         <tr className="text-left border-b">
           <th className="py-2">Dealer</th>
           <th className="py-2">Car</th>
+          <th className="py-2">Qty</th>
           <th className="py-2">Message</th>
           <th className="py-2">Submitted</th>
         </tr>
@@ -30,13 +31,14 @@ export default function DealerStockRequests({ loaderData }: Route.ComponentProps
             <td className="py-2">
               {request.carMake} {request.carModel}
             </td>
+            <td className="py-2">{request.quantity}</td>
             <td className="py-2">{request.message}</td>
             <td className="py-2">{new Date(request.createdAt).toLocaleDateString()}</td>
           </tr>
         ))}
         {loaderData.requests.length === 0 && (
           <tr>
-            <td colSpan={4} className="py-4 text-gray-500">
+            <td colSpan={5} className="py-4 text-gray-500">
               No requests yet.
             </td>
           </tr>

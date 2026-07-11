@@ -26,12 +26,19 @@ export async function listAssignedCarsForDealer(dealerId: string) {
     .orderBy(desc(cars.createdAt));
 }
 
-export async function submitStockRequest(input: { dealerId: string; carMake: string; carModel: string; message: string }) {
+export async function submitStockRequest(input: {
+  dealerId: string;
+  carMake: string;
+  carModel: string;
+  quantity: number;
+  message: string;
+}) {
   await db.insert(dealerStockRequests).values({
     id: crypto.randomUUID(),
     dealerId: input.dealerId,
     carMake: input.carMake.trim(),
     carModel: input.carModel.trim(),
+    quantity: input.quantity,
     message: input.message.trim() || null,
     status: "open",
     createdAt: new Date(),

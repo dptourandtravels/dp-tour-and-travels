@@ -4,6 +4,7 @@ import { db } from "./auth.server";
 import { cars, users, agreements } from "../db/schema";
 import type { AgreementFields } from "./agreements";
 import { notifyUser } from "./notifications.server";
+import { logAudit } from "./audit.server";
 
 const dealerUser = alias(users, "dealerUser");
 
@@ -70,6 +71,14 @@ export async function confirmAgreement(
     rate: input.fields.rate,
     issuedByUserId: actorUserId,
     createdAt: new Date(),
+  });
+
+  await logAudit({
+    entityType: "agreement",
+    entityId: id,
+    action: "confirm",
+    actorUserId,
+    after: { carId: input.carId, partyUserId: input.partyUserId, ...input.fields },
   });
 
   await notifyUser({

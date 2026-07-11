@@ -109,6 +109,10 @@ export async function listUsersByRole(role: Role) {
   return db.select().from(users).where(eq(users.role, role));
 }
 
+export async function updateUserRole(userId: string, role: Role) {
+  await db.update(users).set({ role }).where(eq(users.id, userId));
+}
+
 export async function getOrCreateClient(email: string, name: string) {
   const normalizedEmail = email.trim().toLowerCase();
   const existing = await findUserByEmail(normalizedEmail);

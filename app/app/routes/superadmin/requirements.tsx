@@ -21,10 +21,16 @@ export async function action({ request }: Route.ActionArgs) {
 
   const title = String(form.get("title") ?? "").trim();
   const description = String(form.get("description") ?? "");
+  const color = String(form.get("color") ?? "").trim();
+  const quantityRaw = String(form.get("quantity") ?? "").trim();
+  const quantity = quantityRaw ? Number(quantityRaw) : null;
   if (!title) {
     return data({ error: "Title is required." }, { status: 400 });
   }
-  await createCarRequirement(title, description);
+  if (quantityRaw && (!Number.isInteger(quantity) || quantity! <= 0)) {
+    return data({ error: "Quantity must be a positive whole number." }, { status: 400 });
+  }
+  await createCarRequirement(title, description, color, quantity);
   return data({ success: true as const });
 }
 
@@ -33,7 +39,9 @@ export default function Requirements({ loaderData, actionData }: Route.Component
     <div className="flex flex-col gap-8">
       <Form method="post" className="flex flex-col gap-4 max-w-sm">
         <h2 className="font-semibold">Add requirement</h2>
-        <input name="title" placeholder="Title (e.g. SUV in Bangalore)" required className="border rounded px-3 py-2" />
+        <input name="title" placeholder="Vehicle model (e.g. Maruti Suzuki Brezza)" required className="border rounded px-3 py-2" />
+        <input name="color" placeholder="Color (optional)" className="border rounded px-3 py-2" />
+        <input name="quantity" type="number" min="1" placeholder="Qty required (optional)" className="border rounded px-3 py-2" />
         <textarea name="description" placeholder="Description (optional)" className="border rounded px-3 py-2" />
         {actionData && "error" in actionData && <p className="text-red-600 text-sm">{actionData.error}</p>}
         <button type="submit" className="bg-black text-white rounded px-3 py-2 w-fit">
@@ -44,7 +52,8 @@ export default function Requirements({ loaderData, actionData }: Route.Component
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="text-left border-b">
-            <th className="py-2">Title</th>
+            <th className="py-2">Vehicle model &amp; color</th>
+            <th className="py-2">Qty required</th>
             <th className="py-2">Status</th>
             <th className="py-2"></th>
           </tr>
@@ -54,8 +63,10 @@ export default function Requirements({ loaderData, actionData }: Route.Component
             <tr key={r.id} className="border-b align-top">
               <td className="py-2">
                 {r.title}
+                {r.color && ` — ${r.color}`}
                 {r.description && <div className="text-xs text-gray-500">{r.description}</div>}
               </td>
+              <td className="py-2">{r.quantity ?? "—"}</td>
               <td className="py-2">{r.status}</td>
               <td className="py-2">
                 {r.status === "open" && (

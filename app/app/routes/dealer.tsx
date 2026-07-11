@@ -26,13 +26,14 @@ export async function action({ request }: Route.ActionArgs) {
   const form = await request.formData();
   const carMake = String(form.get("carMake") ?? "").trim();
   const carModel = String(form.get("carModel") ?? "").trim();
+  const quantity = Number(form.get("quantity") ?? "");
   const message = String(form.get("message") ?? "");
 
-  if (!carMake || !carModel) {
-    return data({ error: "Make and model are required." }, { status: 400 });
+  if (!carMake || !carModel || !Number.isInteger(quantity) || quantity <= 0) {
+    return data({ error: "Make, model, and a valid quantity are required." }, { status: 400 });
   }
 
-  await submitStockRequest({ dealerId: user.id, carMake, carModel, message });
+  await submitStockRequest({ dealerId: user.id, carMake, carModel, quantity, message });
   return data({ success: true as const });
 }
 
@@ -119,6 +120,7 @@ export default function DealerDashboard({ loaderData, actionData }: Route.Compon
         <Form method="post" className="flex flex-col gap-3 max-w-sm">
           <input name="carMake" placeholder="Make" required className="border rounded px-3 py-2" />
           <input name="carModel" placeholder="Model" required className="border rounded px-3 py-2" />
+          <input name="quantity" type="number" min="1" placeholder="Quantity" required className="border rounded px-3 py-2" />
           <textarea name="message" placeholder="Anything else? (optional)" className="border rounded px-3 py-2" />
           <button type="submit" className="bg-black text-white rounded px-3 py-2 w-fit">
             Submit request
@@ -129,7 +131,7 @@ export default function DealerDashboard({ loaderData, actionData }: Route.Compon
           <ul className="mt-4 text-sm flex flex-col gap-1">
             {myRequests.map((r) => (
               <li key={r.id}>
-                {r.carMake} {r.carModel} — {r.status} ({new Date(r.createdAt).toLocaleDateString()})
+                {r.quantity}x {r.carMake} {r.carModel} — {r.status} ({new Date(r.createdAt).toLocaleDateString()})
               </li>
             ))}
           </ul>

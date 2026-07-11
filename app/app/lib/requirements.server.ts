@@ -15,11 +15,18 @@ export async function getCarRequirement(id: string) {
   return row ?? null;
 }
 
-export async function createCarRequirement(title: string, description: string) {
+export async function createCarRequirement(
+  title: string,
+  description: string,
+  color: string,
+  quantity: number | null,
+) {
   await db.insert(carRequirements).values({
     id: crypto.randomUUID(),
     title,
     description: description || null,
+    color: color || null,
+    quantity,
     status: "open",
     createdAt: new Date(),
   });

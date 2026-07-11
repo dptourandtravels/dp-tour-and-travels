@@ -1,26 +1,18 @@
 import { desc, eq } from "drizzle-orm";
 import { db, getOrCreateClient } from "./auth.server";
-import { cars, payments, users, auditLog, type PaymentMethod } from "../db/schema";
+import { cars, payments, users, type PaymentMethod } from "../db/schema";
 import { computeDueDate, computeStatus } from "./payments";
 import { notifyUser } from "./notifications.server";
+import { logAudit as logAuditEntry } from "./audit.server";
 
-async function logAudit(params: {
+function logAudit(params: {
   entityId: string;
   action: string;
   actorUserId: string | null;
   before?: unknown;
   after?: unknown;
 }) {
-  await db.insert(auditLog).values({
-    id: crypto.randomUUID(),
-    entityType: "payment",
-    entityId: params.entityId,
-    action: params.action,
-    actorUserId: params.actorUserId,
-    beforeValue: params.before === undefined ? null : JSON.stringify(params.before),
-    afterValue: params.after === undefined ? null : JSON.stringify(params.after),
-    createdAt: new Date(),
-  });
+  return logAuditEntry({ entityType: "payment", ...params });
 }
 
 export async function createCarWithPayment(

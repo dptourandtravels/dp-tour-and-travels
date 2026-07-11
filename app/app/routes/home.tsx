@@ -28,9 +28,10 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
       <h1 className="text-3xl font-semibold mb-4">DP Tour and Travels</h1>
       <p className="text-gray-600 dark:text-gray-400 mb-2">
-        Own a car sitting idle? Lease it to us for a steady monthly payout — we handle the rest. We supply
-        well-maintained vehicles to our network of dealers, so your car stays on the road and your income
-        stays predictable.
+        We build relationships, not just deals. Hand over your brand-new car and we treat it — and you — like
+        family: full satisfaction and approval of the car owner at every step. You cover the insurance; we
+        handle maintenance, servicing, driver, fuel, and challans for the full 5-year term, backed by a steady
+        monthly payout.
       </p>
       <p className="text-sm mb-10">
         <Link to="/terms" className="underline">
@@ -42,17 +43,38 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       {loaderData.requirements.length === 0 && (
         <p className="text-gray-500 mb-10">No open requirements at the moment — check back soon.</p>
       )}
-      <ul className="flex flex-col gap-4 mb-10">
-        {loaderData.requirements.map((r) => (
-          <li key={r.id} className="border rounded p-4">
-            <p className="font-semibold">{r.title}</p>
-            {r.description && <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{r.description}</p>}
-            <Link to={`/requirements/${r.id}/apply`} className="underline text-sm">
-              I have this car — apply now
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {loaderData.requirements.length > 0 && (
+        <div className="overflow-x-auto mb-10">
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="text-left border-b">
+                <th className="py-2 pr-2">S. No.</th>
+                <th className="py-2 pr-2">Vehicle Model &amp; Color</th>
+                <th className="py-2 pr-2">Qty. Required</th>
+                <th className="py-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {loaderData.requirements.map((r, i) => (
+                <tr key={r.id} className="border-b align-top">
+                  <td className="py-2 pr-2">{i + 1}</td>
+                  <td className="py-2 pr-2">
+                    {r.title}
+                    {r.color && ` — ${r.color}`}
+                    {r.description && <div className="text-xs text-gray-500">{r.description}</div>}
+                  </td>
+                  <td className="py-2 pr-2">{r.quantity ?? "—"}</td>
+                  <td className="py-2">
+                    <Link to={`/requirements/${r.id}/apply`} className="underline text-sm">
+                      Book Slot
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <h2 className="text-xl font-semibold mb-4">Want to become a dealer?</h2>
       <Link to="/dealers/apply" className="underline">

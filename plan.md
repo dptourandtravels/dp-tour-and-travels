@@ -84,5 +84,7 @@
 > Car→dealer assignment is columns on `cars` (`dealerId`, `leaseStartDate`, `leaseEndDate`) — one active assignment per car, no history table. Reassigning a car just overwrites these; nothing preserves the previous dealer/lease record.
 
 ### Phase 8 — Polish & Sign-off
-- Mobile-responsive pass on public site.
-- Full PRD acceptance checklist (Sections 1-9) walkthrough.
+- Mobile-responsive pass on public site. - Done
+- Full PRD acceptance checklist (Sections 1-9) walkthrough. - Done
+
+> No standalone PRD file exists in this repo, so the "Verify:" line under each phase above served as the acceptance checklist. Walked phases 1-7 against the code: RBAC (`requireUser` scoped correctly on every route, agreements/notifications row-scoped by `user.id`), audit log (RED↔GREEN and price edits logged in `cars.server.ts`), reminder cron (`reminders.test.ts` passes, dedup via `alreadySent`), agreement PDF (all 5 fields render, shared client/dealer flow), Phase 5-7 spot-checks (intake, document upload, dealer stock) — all confirmed working. Public site (`home`, `dealers.apply`, `requirements.$id.apply`, `terms`, `login`) already single-column/fluid Tailwind with no fixed widths — no mobile-responsive changes needed.
