@@ -1,9 +1,8 @@
 import { env } from "cloudflare:workers";
 import { data, Form } from "react-router";
-import { eq } from "drizzle-orm";
 import type { Route } from "./+types/forgot-password";
-import { db, sha256Hex } from "../lib/auth.server";
-import { users, passwordResetTokens } from "../db/schema";
+import { db, findUserByEmail, sha256Hex } from "../lib/auth.server";
+import { passwordResetTokens } from "../db/schema";
 
 const TOKEN_TTL_MS = 60 * 60 * 1000;
 
@@ -11,7 +10,7 @@ export async function action({ request }: Route.ActionArgs) {
   const form = await request.formData();
   const email = String(form.get("email") ?? "").trim().toLowerCase();
 
-  const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  const user = await findUserByEmail(email);
   if (user) {
     const token = crypto.randomUUID() + crypto.randomUUID();
     await db.insert(passwordResetTokens).values({

@@ -1,13 +1,15 @@
-import { Form } from "react-router";
+import { Form, Link } from "react-router";
 
 export function DashboardShell({
   title,
   name,
   email,
+  children,
 }: {
   title: string;
   name: string;
   email: string;
+  children?: React.ReactNode;
 }) {
   return (
     <main className="max-w-2xl mx-auto pt-16 px-4">
@@ -22,6 +24,10 @@ export function DashboardShell({
       <p>
         Signed in as {name} ({email}).
       </p>
+      <Link to="/notifications" className="block mt-2 text-sm underline">
+        Notifications
+      </Link>
+      {children}
     </main>
   );
 }

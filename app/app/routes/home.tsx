@@ -1,19 +1,16 @@
-import { env } from "cloudflare:workers";
-
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
 
 export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
-  ];
+  return [{ title: "DP Tour and Travels" }, { name: "description", content: "DP Tour and Travels" }];
 }
 
-export function loader() {
-  return { message: env.VALUE_FROM_CLOUDFLARE };
-}
-
-export default function Home({ loaderData }: Route.ComponentProps) {
-  return <Welcome message={loaderData.message} />;
+export default function Home() {
+  return (
+    <main className="max-w-sm mx-auto pt-24 px-4 text-center">
+      <h1 className="text-2xl font-semibold mb-6">DP Tour and Travels</h1>
+      <a href="/login" className="underline">
+        Sign in
+      </a>
+    </main>
+  );
 }

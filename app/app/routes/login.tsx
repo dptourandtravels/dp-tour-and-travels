@@ -1,8 +1,7 @@
 import { data, Form, redirect } from "react-router";
-import { eq } from "drizzle-orm";
 import type { Route } from "./+types/login";
-import { db, verifyPassword, createSession, getSessionUser, dashboardPathForRole } from "../lib/auth.server";
-import { users, type Role } from "../db/schema";
+import { findUserByEmail, verifyPassword, createSession, getSessionUser, dashboardPathForRole } from "../lib/auth.server";
+import { type Role } from "../db/schema";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getSessionUser(request);
@@ -15,7 +14,7 @@ export async function action({ request }: Route.ActionArgs) {
   const email = String(form.get("email") ?? "").trim().toLowerCase();
   const password = String(form.get("password") ?? "");
 
-  const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  const user = await findUserByEmail(email);
   if (!user || !(await verifyPassword(password, user.passwordHash))) {
     return data({ error: "Invalid email or password." }, { status: 401 });
   }

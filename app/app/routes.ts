@@ -15,4 +15,10 @@ export default [
     route("users/new", "routes/superadmin/users.new.tsx"),
     route("users/bulk", "routes/superadmin/users.bulk.tsx"),
   ]),
+  route("cars", "routes/cars/layout.tsx", [
+    index("routes/cars/list.tsx"),
+    route("new", "routes/cars/new.tsx"),
+  ]),
+  route("notifications", "routes/notifications.tsx"),
+  route("agreements/new", "routes/agreements.new.tsx"),
 ] satisfies RouteConfig;

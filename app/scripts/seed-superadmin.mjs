@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 import { writeFileSync, unlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { hashPassword, randomHex } from "../app/lib/crypto.ts";
+import { hashPassword, generatePassword } from "../app/lib/crypto.ts";
 
 const [, , email, name, ...rest] = process.argv;
 const remote = rest.includes("--remote");
@@ -18,7 +18,7 @@ function sqlEscape(value) {
   return value.replace(/'/g, "''");
 }
 
-const password = randomHex(9);
+const password = generatePassword();
 const id = crypto.randomUUID();
 const passwordHash = await hashPassword(password);
 const createdAt = Date.now();

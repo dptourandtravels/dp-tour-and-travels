@@ -12,6 +12,11 @@ const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 export const db = drizzle(env.DB);
 
+export async function findUserByEmail(email: string) {
+  const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return user ?? null;
+}
+
 function cookieHeader(value: string, maxAgeSeconds: number) {
   const secure = import.meta.env.PROD ? " Secure;" : "";
   return `${SESSION_COOKIE}=${value}; HttpOnly;${secure} SameSite=Lax; Path=/; Max-Age=${maxAgeSeconds}`;
@@ -67,6 +72,20 @@ export async function requireUser(request: Request, allowedRoles?: Role[]) {
 
 type StaffRole = "superadmin" | "finance";
 
+async function insertUser(email: string, name: string, role: Role) {
+  const password = generatePassword();
+  const user = {
+    id: crypto.randomUUID(),
+    email,
+    name,
+    role,
+    passwordHash: await hashPassword(password),
+    createdAt: new Date(),
+  };
+  await db.insert(users).values(user);
+  return { user, password };
+}
+
 export async function createStaffUser(
   input: { email: string; name: string; role: StaffRole },
 ): Promise<{ error: "missing/invalid field" | "already exists" } | { email: string; password: string }> {
@@ -77,20 +96,19 @@ export async function createStaffUser(
     return { error: "missing/invalid field" as const };
   }
 
-  const [existing] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  const existing = await findUserByEmail(email);
   if (existing) {
     return { error: "already exists" as const };
   }
 
-  const password = generatePassword();
-  await db.insert(users).values({
-    id: crypto.randomUUID(),
-    email,
-    name,
-    role: input.role,
-    passwordHash: await hashPassword(password),
-    createdAt: new Date(),
-  });
-
+  const { password } = await insertUser(email, name, input.role);
   return { email, password };
+}
+
+export async function getOrCreateClient(email: string, name: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+  const existing = await findUserByEmail(normalizedEmail);
+  if (existing) return { user: existing, password: null };
+
+  return insertUser(normalizedEmail, name.trim(), "client");
 }

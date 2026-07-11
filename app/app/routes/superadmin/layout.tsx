@@ -23,6 +23,9 @@ export default function SuperadminLayout({ loaderData }: Route.ComponentProps) {
         <Link to="/superadmin/users">Users</Link>
         <Link to="/superadmin/users/new">Add user</Link>
         <Link to="/superadmin/users/bulk">Bulk import</Link>
+        <Link to="/cars">Cars &amp; payments</Link>
+        <Link to="/agreements/new">New agreement</Link>
+        <Link to="/notifications">Notifications</Link>
       </nav>
       <Outlet />
     </main>
