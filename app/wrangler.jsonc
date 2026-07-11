@@ -21,7 +21,14 @@
 		{
 			"binding": "DB",
 			"database_name": "dp-tour-travels-db",
-			"database_id": "a5839d0c-4fb9-40d2-9a29-f088f749b20b"
+			"database_id": "a5839d0c-4fb9-40d2-9a29-f088f749b20b",
+			"migrations_dir": "./migrations"
+		}
+	],
+	// TODO: requires Workers Paid plan + a verified sending domain (see plan.md note under Phase 1).
+	"send_email": [
+		{
+			"name": "EMAIL"
 		}
 	]
 	/**

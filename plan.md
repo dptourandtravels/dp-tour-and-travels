@@ -16,6 +16,7 @@
 | Reminders (7/3/0-day) | Cloudflare Cron Triggers |
 | CSV bulk import | In-Worker parsing, no dependency |
 | Notifications | In-app only (`notifications` table + inbox), no email/SMS |
+| Transactional email | Cloudflare Email Sending (`env.EMAIL`), password-reset links only — everything else stays in-app per the row above |
 | CI/CD | GitHub → Cloudflare Workers Git integration |
 
 ## Data model (tables)
@@ -34,6 +35,10 @@
 - Superadmin/Finance/Client/Dealer login, self-service password reset.
 - Superadmin: create Admin/Finance accounts individually + bulk via CSV (auto-generated passwords).
 - Verify: each role logs in and sees only its own routes.
+
+> **TODO:** Password reset emails need Workers Paid plan + a verified sending domain (`send_email` binding is wired in `app/wrangler.jsonc`, call is in `app/app/routes/forgot-password.tsx`, wrapped in try/catch so it fails quietly for now — `E_SENDER_NOT_VERIFIED`). Once you've upgraded and enabled Email Sending on your domain, tell Claude and the try/catch guard can come out.
+>
+> First superadmin login is bootstrapped via `node scripts/seed-superadmin.mjs <email> <name> [--remote]` (run from `app/`) — account creation itself requires being logged in as a superadmin, so this one-time script seeds the first account directly into D1.
 
 ### Phase 2 — Car & Payment Lifecycle
 - Finance logs car receipt date; system computes payout due date (+70 days).
