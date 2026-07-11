@@ -18,7 +18,7 @@ export default function SuperadminLayout({ loaderData }: Route.ComponentProps) {
         </Form>
       </div>
       <p className="mb-4">Signed in as {loaderData.name} ({loaderData.email}).</p>
-      <nav className="flex gap-4 mb-8 text-sm underline">
+      <nav className="flex flex-wrap gap-4 mb-8 text-sm underline">
         <Link to="/superadmin">Dashboard</Link>
         <Link to="/superadmin/users">Users</Link>
         <Link to="/superadmin/users/new">Add user</Link>
@@ -26,6 +26,9 @@ export default function SuperadminLayout({ loaderData }: Route.ComponentProps) {
         <Link to="/cars">Cars &amp; payments</Link>
         <Link to="/agreements/new">New agreement</Link>
         <Link to="/notifications">Notifications</Link>
+        <Link to="/superadmin/requirements">Car requirements</Link>
+        <Link to="/superadmin/intake">Intake</Link>
+        <Link to="/superadmin/dealer-applications">Dealer applications</Link>
       </nav>
       <Outlet />
     </main>

@@ -63,7 +63,7 @@
 - Apply for Dealer page (eligibility shown before form).
 - Car requirement / slot booking flow: visitor submits details → accepts T&Cs → client account auto-created → appears on Superadmin dashboard.
 - Superadmin manually closes fulfilled requirements.
-- Verify: submitting a slot booking creates a client row and shows up for Superadmin to review.
+- Verify: submitting a slot booking creates a client row and shows up for Superadmin to review. - Done
 
 ### Phase 6 — Client Portal
 - Dashboard: registered cars, registration date, payment status/method.

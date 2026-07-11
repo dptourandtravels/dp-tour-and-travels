@@ -108,3 +108,42 @@ export const agreements = sqliteTable("agreements", {
     .references(() => users.id),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
+
+export const carRequirementStatuses = ["open", "closed"] as const;
+export type CarRequirementStatus = (typeof carRequirementStatuses)[number];
+
+export const carRequirements = sqliteTable("car_requirements", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description"),
+  status: text("status", { enum: carRequirementStatuses }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  closedAt: integer("closed_at", { mode: "timestamp" }),
+});
+
+export const clientIntakeApplications = sqliteTable("client_intake_applications", {
+  id: text("id").primaryKey(),
+  carRequirementId: text("car_requirement_id")
+    .notNull()
+    .references(() => carRequirements.id),
+  clientUserId: text("client_user_id")
+    .notNull()
+    .references(() => users.id),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  carMake: text("car_make").notNull(),
+  carModel: text("car_model").notNull(),
+  message: text("message"),
+  acceptedTermsAt: integer("accepted_terms_at", { mode: "timestamp" }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
+
+export const dealerApplications = sqliteTable("dealer_applications", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  message: text("message"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
