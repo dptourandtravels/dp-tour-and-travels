@@ -68,12 +68,20 @@
 ### Phase 6 — Client Portal
 - Dashboard: registered cars, registration date, payment status/method.
 - Document upload checklist (Aadhaar, PAN, DL, photo, RC, plate photo, signed agreement) to R2.
-- Agreement view/download.
+- Agreement view/download. - Done
+
+> **TODO:** R2 still isn't enabled on the Cloudflare account (`r2_buckets` binding added to `app/wrangler.jsonc`, works today via `wrangler dev`'s local R2 simulation). Once R2 is enabled (dash.cloudflare.com → R2 → Enable), run `wrangler r2 bucket create dp-tour-travels-documents` and redeploy — no code changes needed.
+>
+> Added a `method` column to `payments` (cash/upi/bank_transfer/cheque) since the client dashboard needed to show it — Finance now picks a method when marking a payment paid (`app/app/routes/cars/list.tsx`).
 
 ### Phase 7 — Dealer Portal
 - View current/upcoming stock, request cars (saved as demand record).
 - Assigned car details: lease dates, first-party (client) details.
-- Dealer agreement (same module as Phase 4).
+- Dealer agreement (same module as Phase 4). - Done
+
+> **TODO:** Scoped to the three bullets above only — no `dealer_collections` table or dealer-side payment/collection tracking yet, even though it's in the data model list above and the Phase 3 reminders code has a TODO expecting it. Add that as its own pass (table + GREEN/RED status + wiring into `runDailyReminders` in `app/app/lib/reminders.server.ts`) if/when dealer money tracking is needed.
+>
+> Car→dealer assignment is columns on `cars` (`dealerId`, `leaseStartDate`, `leaseEndDate`) — one active assignment per car, no history table. Reassigning a car just overwrites these; nothing preserves the previous dealer/lease record.
 
 ### Phase 8 — Polish & Sign-off
 - Mobile-responsive pass on public site.

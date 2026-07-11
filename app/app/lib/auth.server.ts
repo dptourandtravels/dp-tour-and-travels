@@ -105,6 +105,10 @@ export async function createStaffUser(
   return { email, password };
 }
 
+export async function listUsersByRole(role: Role) {
+  return db.select().from(users).where(eq(users.role, role));
+}
+
 export async function getOrCreateClient(email: string, name: string) {
   const normalizedEmail = email.trim().toLowerCase();
   const existing = await findUserByEmail(normalizedEmail);

@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const roles = ["superadmin", "finance", "client", "dealer"] as const;
 export type Role = (typeof roles)[number];
@@ -39,11 +39,17 @@ export const cars = sqliteTable("cars", {
   model: text("model").notNull(),
   registrationNumber: text("registration_number").notNull().unique(),
   receiptDate: integer("receipt_date", { mode: "timestamp" }).notNull(),
+  dealerId: text("dealer_id").references(() => users.id),
+  leaseStartDate: integer("lease_start_date", { mode: "timestamp" }),
+  leaseEndDate: integer("lease_end_date", { mode: "timestamp" }),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
 export const paymentStatuses = ["green", "red"] as const;
 export type PaymentStatus = (typeof paymentStatuses)[number];
+
+export const paymentMethods = ["cash", "upi", "bank_transfer", "cheque"] as const;
+export type PaymentMethod = (typeof paymentMethods)[number];
 
 export const payments = sqliteTable("payments", {
   id: text("id").primaryKey(),
@@ -53,6 +59,7 @@ export const payments = sqliteTable("payments", {
   amount: integer("amount").notNull(),
   dueDate: integer("due_date", { mode: "timestamp" }).notNull(),
   status: text("status", { enum: paymentStatuses }).notNull(),
+  method: text("method", { enum: paymentMethods }),
   paidAt: integer("paid_at", { mode: "timestamp" }),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
@@ -74,6 +81,7 @@ export const notificationTypes = [
   "reminder_due",
   "payout_scheduled",
   "agreement_issued",
+  "car_assigned",
 ] as const;
 export type NotificationType = (typeof notificationTypes)[number];
 
@@ -147,3 +155,33 @@ export const dealerApplications = sqliteTable("dealer_applications", {
   message: text("message"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
+
+export const dealerStockRequests = sqliteTable("dealer_stock_requests", {
+  id: text("id").primaryKey(),
+  dealerId: text("dealer_id")
+    .notNull()
+    .references(() => users.id),
+  carMake: text("car_make").notNull(),
+  carModel: text("car_model").notNull(),
+  message: text("message"),
+  status: text("status", { enum: carRequirementStatuses }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
+
+export const documentTypes = ["aadhaar", "pan", "dl", "photo", "rc", "plate_photo", "signed_agreement"] as const;
+export type DocumentType = (typeof documentTypes)[number];
+
+export const documents = sqliteTable(
+  "documents",
+  {
+    id: text("id").primaryKey(),
+    clientId: text("client_id")
+      .notNull()
+      .references(() => users.id),
+    docType: text("doc_type", { enum: documentTypes }).notNull(),
+    fileName: text("file_name").notNull(),
+    r2Key: text("r2_key").notNull(),
+    uploadedAt: integer("uploaded_at", { mode: "timestamp" }).notNull(),
+  },
+  (table) => [uniqueIndex("documents_client_doc_type_unique").on(table.clientId, table.docType)],
+);

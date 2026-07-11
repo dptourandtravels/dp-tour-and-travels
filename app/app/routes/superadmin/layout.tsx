@@ -29,6 +29,7 @@ export default function SuperadminLayout({ loaderData }: Route.ComponentProps) {
         <Link to="/superadmin/requirements">Car requirements</Link>
         <Link to="/superadmin/intake">Intake</Link>
         <Link to="/superadmin/dealer-applications">Dealer applications</Link>
+        <Link to="/superadmin/dealer-stock-requests">Dealer stock requests</Link>
       </nav>
       <Outlet />
     </main>

@@ -17,14 +17,15 @@ export async function action({ request }: Route.ActionArgs) {
   const carId = String(form.get("carId") ?? "");
   const rate = Number(form.get("rate"));
   const aadhaarUid = String(form.get("aadhaarUid") ?? "").trim();
+  const party = form.get("party") === "dealer" ? ("dealer" as const) : ("client" as const);
 
   if (!carId || !Number.isFinite(rate) || rate <= 0 || !aadhaarUid) {
     return data({ error: "Select a car and fill rate + Aadhaar UID." }, { status: 400 });
   }
 
-  const built = await buildAgreementFields(carId, rate, aadhaarUid);
+  const built = await buildAgreementFields(carId, rate, aadhaarUid, party);
   if (!built) {
-    return data({ error: "Car not found." }, { status: 400 });
+    return data({ error: "Car not found, or no dealer is assigned to it." }, { status: 400 });
   }
 
   if (intent === "confirm") {
@@ -34,7 +35,7 @@ export async function action({ request }: Route.ActionArgs) {
 
   const pdfBytes = await renderAgreementPdf(built.fields);
   const pdfBase64 = toBase64(pdfBytes);
-  return data({ preview: { carId: built.carId, fields: built.fields, pdfBase64 } });
+  return data({ preview: { carId: built.carId, party, fields: built.fields, pdfBase64 } });
 }
 
 function toBase64(bytes: Uint8Array): string {
@@ -45,11 +46,11 @@ function toBase64(bytes: Uint8Array): string {
 
 export default function NewAgreement({ loaderData, actionData }: Route.ComponentProps) {
   if (actionData && "confirmed" in actionData) {
-    return <p>Agreement issued and the client has been notified.</p>;
+    return <p>Agreement issued and the recipient has been notified.</p>;
   }
 
   if (actionData && "preview" in actionData) {
-    const { carId, fields, pdfBase64 } = actionData.preview;
+    const { carId, party, fields, pdfBase64 } = actionData.preview;
     const dataUrl = `data:application/pdf;base64,${pdfBase64}`;
     return (
       <div className="flex flex-col gap-4">
@@ -60,6 +61,7 @@ export default function NewAgreement({ loaderData, actionData }: Route.Component
         <Form method="post">
           <input type="hidden" name="intent" value="confirm" />
           <input type="hidden" name="carId" value={carId} />
+          <input type="hidden" name="party" value={party} />
           <input type="hidden" name="rate" value={fields.rate} />
           <input type="hidden" name="aadhaarUid" value={fields.aadhaarUid} />
           <button type="submit" className="bg-black text-white rounded px-3 py-2">
@@ -78,9 +80,14 @@ export default function NewAgreement({ loaderData, actionData }: Route.Component
           <option value="">Select car</option>
           {loaderData.cars.map((c) => (
             <option key={c.id} value={c.id}>
-              {c.make} {c.model} — {c.registrationNumber} — {c.ownerName}
+              {c.make} {c.model} — {c.registrationNumber} — Owner: {c.ownerName}
+              {c.dealerName ? ` — Dealer: ${c.dealerName}` : ""}
             </option>
           ))}
+        </select>
+        <select name="party" required className="border rounded px-3 py-2">
+          <option value="client">Issue to: Client (owner)</option>
+          <option value="dealer">Issue to: Assigned dealer</option>
         </select>
         <input
           name="rate"

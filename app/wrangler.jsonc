@@ -28,6 +28,15 @@
 			"name": "EMAIL"
 		}
 	],
+	// TODO: R2 not enabled on the Cloudflare account yet (see plan.md Phase 0 TODO). Works locally
+	// via wrangler dev's simulated R2; run `wrangler r2 bucket create dp-tour-travels-documents`
+	// once R2 is enabled so this binding resolves in production.
+	"r2_buckets": [
+		{
+			"binding": "DOCUMENTS",
+			"bucket_name": "dp-tour-travels-documents"
+		}
+	],
 	"triggers": {
 		"crons": ["0 2 * * *"]
 	}

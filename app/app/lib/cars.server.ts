@@ -1,6 +1,6 @@
 import { desc, eq } from "drizzle-orm";
 import { db, getOrCreateClient } from "./auth.server";
-import { cars, payments, users, auditLog } from "../db/schema";
+import { cars, payments, users, auditLog, type PaymentMethod } from "../db/schema";
 import { computeDueDate, computeStatus } from "./payments";
 import { notifyUser } from "./notifications.server";
 
@@ -78,14 +78,7 @@ export async function createCarWithPayment(
   return { client, clientPassword };
 }
 
-export async function listCarsWithPayments() {
-  const rows = await db
-    .select({ car: cars, payment: payments, client: users })
-    .from(cars)
-    .innerJoin(payments, eq(payments.carId, cars.id))
-    .innerJoin(users, eq(users.id, cars.clientId))
-    .orderBy(desc(cars.createdAt));
-
+async function syncPaymentStatuses(rows: { payment: typeof payments.$inferSelect }[]) {
   const now = new Date();
   for (const row of rows) {
     const freshStatus = computeStatus(row.payment, now);
@@ -101,24 +94,49 @@ export async function listCarsWithPayments() {
       row.payment.status = freshStatus;
     }
   }
+}
 
+export async function listCarsWithPayments() {
+  const rows = await db
+    .select({ car: cars, payment: payments, client: users })
+    .from(cars)
+    .innerJoin(payments, eq(payments.carId, cars.id))
+    .innerJoin(users, eq(users.id, cars.clientId))
+    .orderBy(desc(cars.createdAt));
+
+  await syncPaymentStatuses(rows);
   return rows;
 }
 
-export async function markPaymentPaid(paymentId: string, actorUserId: string) {
+export async function listCarsForClient(clientId: string) {
+  const rows = await db
+    .select({ car: cars, payment: payments })
+    .from(cars)
+    .innerJoin(payments, eq(payments.carId, cars.id))
+    .where(eq(cars.clientId, clientId))
+    .orderBy(desc(cars.createdAt));
+
+  await syncPaymentStatuses(rows);
+  return rows;
+}
+
+export async function markPaymentPaid(paymentId: string, actorUserId: string, method: PaymentMethod) {
   const [payment] = await db.select().from(payments).where(eq(payments.id, paymentId)).limit(1);
   if (!payment) return { error: "Payment not found." as const };
   if (payment.paidAt) return { error: "Already marked paid." as const };
 
   const previousStatus = payment.status;
-  await db.update(payments).set({ paidAt: new Date(), status: "green" }).where(eq(payments.id, paymentId));
+  await db
+    .update(payments)
+    .set({ paidAt: new Date(), status: "green", method })
+    .where(eq(payments.id, paymentId));
 
   await logAudit({
     entityId: paymentId,
     action: previousStatus === "red" ? "status_change" : "mark_paid",
     actorUserId,
     before: { status: previousStatus, paidAt: null },
-    after: { status: "green", paidAt: true },
+    after: { status: "green", paidAt: true, method },
   });
 
   return { success: true as const };

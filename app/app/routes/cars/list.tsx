@@ -1,12 +1,14 @@
 import { data, Form } from "react-router";
 import type { Route } from "./+types/list";
-import { requireUser } from "../../lib/auth.server";
+import { requireUser, listUsersByRole } from "../../lib/auth.server";
 import { listCarsWithPayments, markPaymentPaid, editPaymentAmount } from "../../lib/cars.server";
+import { assignCarToDealer } from "../../lib/dealer-stock.server";
+import { paymentMethods, type PaymentMethod } from "../../db/schema";
 
 export async function loader({ request }: Route.LoaderArgs) {
   await requireUser(request, ["finance", "superadmin"]);
-  const rows = await listCarsWithPayments();
-  return { rows };
+  const [rows, dealers] = await Promise.all([listCarsWithPayments(), listUsersByRole("dealer")]);
+  return { rows, dealers };
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -16,7 +18,11 @@ export async function action({ request }: Route.ActionArgs) {
   const paymentId = String(form.get("paymentId") ?? "");
 
   if (intent === "mark_paid") {
-    return data(await markPaymentPaid(paymentId, actor.id));
+    const method = String(form.get("method") ?? "");
+    if (!paymentMethods.includes(method as PaymentMethod)) {
+      return data({ error: "Select a payment method." }, { status: 400 });
+    }
+    return data(await markPaymentPaid(paymentId, actor.id, method as PaymentMethod));
   }
 
   if (intent === "edit_amount") {
@@ -25,6 +31,18 @@ export async function action({ request }: Route.ActionArgs) {
       return data({ error: "Amount must be a positive number." }, { status: 400 });
     }
     return data(await editPaymentAmount(paymentId, amount, actor.id));
+  }
+
+  if (intent === "assign_dealer") {
+    const carId = String(form.get("carId") ?? "");
+    const dealerId = String(form.get("dealerId") ?? "");
+    const leaseStartDate = new Date(String(form.get("leaseStartDate") ?? ""));
+    const leaseEndDate = new Date(String(form.get("leaseEndDate") ?? ""));
+    if (!carId || !dealerId || Number.isNaN(leaseStartDate.getTime()) || Number.isNaN(leaseEndDate.getTime())) {
+      return data({ error: "Select a dealer and both lease dates." }, { status: 400 });
+    }
+    await assignCarToDealer({ carId, dealerId, leaseStartDate, leaseEndDate });
+    return data({ success: true as const });
   }
 
   return data({ error: "Unknown action." }, { status: 400 });
@@ -44,6 +62,7 @@ export default function CarsList({ loaderData, actionData }: Route.ComponentProp
             <th className="py-2">Amount (₹)</th>
             <th className="py-2">Status</th>
             <th className="py-2"></th>
+            <th className="py-2">Dealer</th>
           </tr>
         </thead>
         <tbody>
@@ -84,13 +103,49 @@ export default function CarsList({ loaderData, actionData }: Route.ComponentProp
               </td>
               <td className="py-2">
                 {payment.paidAt ? (
-                  "Paid"
+                  `Paid${payment.method ? ` (${payment.method})` : ""}`
                 ) : (
-                  <Form method="post" action="?index">
+                  <Form method="post" action="?index" className="flex gap-1 items-center">
                     <input type="hidden" name="intent" value="mark_paid" />
                     <input type="hidden" name="paymentId" value={payment.id} />
+                    <select name="method" required className="border rounded px-1 py-1 text-xs">
+                      <option value="">Method</option>
+                      {paymentMethods.map((m) => (
+                        <option key={m} value={m}>
+                          {m}
+                        </option>
+                      ))}
+                    </select>
                     <button type="submit" className="text-xs underline">
                       Mark paid
+                    </button>
+                  </Form>
+                )}
+              </td>
+              <td className="py-2">
+                {car.dealerId ? (
+                  <>
+                    {loaderData.dealers.find((d) => d.id === car.dealerId)?.name ?? "—"}
+                    <br />
+                    {car.leaseStartDate ? new Date(car.leaseStartDate).toLocaleDateString() : "—"} –{" "}
+                    {car.leaseEndDate ? new Date(car.leaseEndDate).toLocaleDateString() : "—"}
+                  </>
+                ) : (
+                  <Form method="post" action="?index" className="flex flex-col gap-1">
+                    <input type="hidden" name="intent" value="assign_dealer" />
+                    <input type="hidden" name="carId" value={car.id} />
+                    <select name="dealerId" required className="border rounded px-1 py-1 text-xs">
+                      <option value="">Dealer</option>
+                      {loaderData.dealers.map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {d.name}
+                        </option>
+                      ))}
+                    </select>
+                    <input name="leaseStartDate" type="date" required className="border rounded px-1 py-1 text-xs" />
+                    <input name="leaseEndDate" type="date" required className="border rounded px-1 py-1 text-xs" />
+                    <button type="submit" className="text-xs underline w-fit">
+                      Assign
                     </button>
                   </Form>
                 )}
