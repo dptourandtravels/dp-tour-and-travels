@@ -4,8 +4,10 @@ import { eq } from "drizzle-orm";
 import { redirect } from "react-router";
 import { users, sessions, type Role } from "../db/schema";
 import { randomHex, hashPassword, generatePassword } from "./crypto";
+import { dashboardPathForRole } from "./roles";
 
 export { verifyPassword, sha256Hex, hashPassword, generatePassword } from "./crypto";
+export { dashboardPathForRole } from "./roles";
 
 const SESSION_COOKIE = "session";
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -55,10 +57,6 @@ export async function getSessionUser(request: Request) {
   const row = rows[0];
   if (!row || row.expiresAt.getTime() < Date.now()) return null;
   return row.user;
-}
-
-export function dashboardPathForRole(role: Role) {
-  return `/${role}`;
 }
 
 export async function requireUser(request: Request, allowedRoles?: Role[]) {

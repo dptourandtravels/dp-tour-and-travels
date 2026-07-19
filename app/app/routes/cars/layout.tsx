@@ -1,6 +1,7 @@
 import { Link, Outlet } from "react-router";
 import type { Route } from "./+types/layout";
-import { requireUser, dashboardPathForRole } from "../../lib/auth.server";
+import { requireUser } from "../../lib/auth.server";
+import { dashboardPathForRole } from "../../lib/roles";
 import type { Role } from "../../db/schema";
 
 export async function loader({ request }: Route.LoaderArgs) {
