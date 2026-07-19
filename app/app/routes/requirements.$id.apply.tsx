@@ -53,7 +53,7 @@ export default function ApplyForRequirement({ loaderData, actionData }: Route.Co
         ) : (
           <p>You already have an account — sign in with your existing email and password.</p>
         )}
-        <Link to="/login" className="block underline text-sm mt-4">
+        <Link to="#" className="block underline text-sm mt-4">
           Sign in
         </Link>
       </main>

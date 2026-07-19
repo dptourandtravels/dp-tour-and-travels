@@ -120,3 +120,29 @@ export async function getOrCreateClient(email: string, name: string) {
 
   return insertUser(normalizedEmail, name.trim(), "client");
 }
+
+export async function signUpClient(input: { email: string; name: string; password: string }) {
+  const email = input.email.trim().toLowerCase();
+  const name = input.name.trim();
+  const password = input.password;
+
+  if (!email || !name || password.length < 8) {
+    return { error: "missing/invalid field" as const };
+  }
+
+  const existing = await findUserByEmail(email);
+  if (existing) {
+    return { error: "already exists" as const };
+  }
+
+  const user = {
+    id: crypto.randomUUID(),
+    email,
+    name,
+    role: "client" as const,
+    passwordHash: await hashPassword(password),
+    createdAt: new Date(),
+  };
+  await db.insert(users).values(user);
+  return { user };
+}

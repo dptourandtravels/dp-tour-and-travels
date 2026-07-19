@@ -1,12 +1,12 @@
 import { useState, type FormEvent } from "react";
 import { data, Link, redirect } from "react-router";
-import type { Route } from "./+types/login";
-import { findUserByEmail, verifyPassword, createSession, getSessionUser, dashboardPathForRole } from "../lib/auth.server";
+import type { Route } from "./+types/get-started";
+import { createSession, getSessionUser, signUpClient, dashboardPathForRole } from "../lib/auth.server";
 import { type Role } from "../db/schema";
 import { DemoPopup } from "../components/demo-popup";
 
 export function meta({}: Route.MetaArgs) {
-  return [{ title: "Sign In — DP Tour & Travels" }];
+  return [{ title: "Get Started — DP Tour & Travels" }];
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -17,38 +17,39 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export async function action({ request }: Route.ActionArgs) {
   const form = await request.formData();
-  const email = String(form.get("email") ?? "").trim().toLowerCase();
+  const name = String(form.get("name") ?? "");
+  const email = String(form.get("email") ?? "");
   const password = String(form.get("password") ?? "");
 
-  const user = await findUserByEmail(email);
-  if (!user || !(await verifyPassword(password, user.passwordHash))) {
-    return data({ error: "Invalid email or password." }, { status: 401 });
+  if (password.length < 8) {
+    return data({ error: "Password must be at least 8 characters." }, { status: 400 });
   }
 
-  const { cookie } = await createSession(user.id);
-  return redirect(dashboardPathForRole(user.role as Role), {
-    headers: { "Set-Cookie": cookie },
-  });
+  const result = await signUpClient({ name, email, password });
+  if ("error" in result) {
+    const message =
+      result.error === "already exists"
+        ? "An account with that email already exists — try signing in instead."
+        : "Enter your name, email, and a password of at least 8 characters.";
+    return data({ error: message }, { status: 400 });
+  }
+
+  const { cookie } = await createSession(result.user.id);
+  return redirect("/client", { headers: { "Set-Cookie": cookie } });
 }
 
-export default function Login(_: Route.ComponentProps) {
-  const [popup, setPopup] = useState<{ ok: boolean; message: string } | null>(null);
+export default function GetStarted(_: Route.ComponentProps) {
+  const [popup, setPopup] = useState<{ name: string } | null>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    const email = String(form.get("email") ?? "");
-    const password = String(form.get("password") ?? "");
-
-    if (email === "admin" && password === "admin") {
-      setPopup({ ok: true, message: "You're signed in as admin." });
-    } else {
-      setPopup({ ok: false, message: "Invalid credentials — try admin / admin." });
-    }
+    const name = String(form.get("name") ?? "");
+    setPopup({ name });
   }
 
   return (
-    <div className="min-h-screen w-full flex bg-surface">
+    <div className="min-h-screen flex bg-surface">
       {/* Brand panel */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-primary text-white flex-col justify-between p-16">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-3xl -translate-y-1/3 translate-x-1/4 pointer-events-none"></div>
@@ -61,13 +62,14 @@ export default function Login(_: Route.ComponentProps) {
 
         <div className="relative z-10 max-w-md">
           <h1 className="font-display-lg text-4xl font-extrabold tracking-tight leading-[1.15] mb-6">
-            We don&apos;t build businesses, we build{" "}
+            Where your car finds{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary-fixed to-yellow-300">
-              relationships.
+              purpose.
             </span>
           </h1>
           <p className="font-body-lg text-lg text-primary-fixed/70 leading-relaxed">
-            Sign in to manage your cars, agreements, and payouts — or your dealer fleet — from one place.
+            Create your account to book a slot, track your payouts, and manage your agreement — all from one
+            dashboard.
           </p>
         </div>
 
@@ -84,16 +86,26 @@ export default function Login(_: Route.ComponentProps) {
             <span className="font-headline-md text-lg font-bold text-primary tracking-tight">DP Tour &amp; Travels</span>
           </Link>
 
-          <h2 className="font-headline-md text-3xl font-bold text-primary tracking-tight mb-2">Welcome back</h2>
-          <p className="font-body-md text-on-surface-variant mb-10">Sign in to your account to continue.</p>
+          <h2 className="font-headline-md text-3xl font-bold text-primary tracking-tight mb-2">Create your account</h2>
+          <p className="font-body-md text-on-surface-variant mb-10">Get started in less than a minute.</p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <label className="flex flex-col gap-1.5">
+              <span className="font-label-md text-label-md text-on-surface-variant">Full name</span>
+              <input
+                name="name"
+                type="text"
+                placeholder="Jane Doe"
+                required
+                className="rounded-xl border border-outline-variant bg-white px-4 py-3 font-body-md text-body-md text-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+              />
+            </label>
             <label className="flex flex-col gap-1.5">
               <span className="font-label-md text-label-md text-on-surface-variant">Email</span>
               <input
                 name="email"
-                type="text"
-                placeholder="admin"
+                type="email"
+                placeholder="you@example.com"
                 required
                 className="rounded-xl border border-outline-variant bg-white px-4 py-3 font-body-md text-body-md text-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
               />
@@ -103,8 +115,9 @@ export default function Login(_: Route.ComponentProps) {
               <input
                 name="password"
                 type="password"
-                placeholder="admin"
+                placeholder="At least 8 characters"
                 required
+                minLength={8}
                 className="rounded-xl border border-outline-variant bg-white px-4 py-3 font-body-md text-body-md text-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
               />
             </label>
@@ -113,33 +126,32 @@ export default function Login(_: Route.ComponentProps) {
               type="submit"
               className="mt-2 rounded-xl bg-primary text-white py-3.5 font-label-md text-label-md font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
             >
-              Sign in
+              Create account
             </button>
           </form>
 
           {popup && (
             <DemoPopup
-              ok={popup.ok}
-              title={popup.ok ? "Sign in is working" : "Sign in failed"}
-              message={popup.message}
+              ok
+              title="Signup is working"
+              message={`Thanks, ${popup.name}! Your account request has been received.`}
               onClose={() => setPopup(null)}
             />
           )}
 
-          <div className="flex items-center justify-between mt-6">
-            <Link
-              to="/forgot-password"
-              className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors"
-            >
-              Forgot password?
+          <p className="mt-6 font-label-md text-label-md text-on-surface-variant">
+            Already have an account?{" "}
+            <Link to="#" className="text-secondary font-semibold hover:underline underline-offset-4">
+              Sign in
             </Link>
-            <Link
-              to="#"
-              className="font-label-md text-label-md text-secondary font-semibold hover:underline underline-offset-4"
-            >
-              Create an account
+          </p>
+
+          <p className="mt-4 font-label-md text-label-sm text-on-surface-variant/70">
+            Want to become a dealer instead?{" "}
+            <Link to="/dealers/apply" className="text-primary font-semibold hover:underline underline-offset-4">
+              Apply here
             </Link>
-          </div>
+          </p>
         </div>
       </div>
     </div>

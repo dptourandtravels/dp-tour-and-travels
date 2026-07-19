@@ -49,13 +49,13 @@ export default function Home() {
           {/* Action Buttons */}
           <div className="flex items-center gap-4">
             <Link
-              to="/login"
+              to="#"
               className="px-6 py-2.5 rounded-lg text-primary font-label-md text-label-md font-medium hover:bg-surface-variant transition-colors hidden sm:block"
             >
               Login
             </Link>
             <Link
-              to="/get-started"
+              to="#"
               className="px-6 py-2.5 rounded-lg bg-primary text-white hover:bg-blue-900 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-primary/30 active:scale-95 font-label-md text-label-md font-semibold"
             >
               Get Started
@@ -90,7 +90,7 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
             <Link
-              to="/get-started"
+              to="#"
               className="px-8 py-4 rounded-xl bg-primary text-white hover:bg-blue-900 transition-all duration-300 shadow-xl shadow-primary/20 hover:shadow-2xl hover:-translate-y-1 font-label-md text-label-md font-semibold text-center flex items-center justify-center gap-2 group"
             >
               Get Started
@@ -144,7 +144,7 @@ export default function Home() {
                 rest—maintenance, legal, and guaranteed monthly earnings.
               </p>
               <Link
-                to="/terms"
+                to="#"
                 className="inline-flex items-center gap-2 text-secondary font-bold text-lg hover:gap-4 transition-all relative z-10 group/link"
               >
                 Learn about leasing
@@ -171,7 +171,7 @@ export default function Home() {
                 and payments so you can focus on the road.
               </p>
               <Link
-                to="/dealers/apply"
+                to="#"
                 className="inline-flex items-center gap-2 text-secondary-fixed font-bold text-lg hover:gap-4 transition-all relative z-10 group/link"
               >
                 Explore fleet options
@@ -203,13 +203,13 @@ export default function Home() {
 
           <nav className="flex flex-wrap justify-center md:justify-end gap-x-8 gap-y-4 w-full md:w-2/3 md:pt-2">
             <Link
-              to="/terms"
+              to="#"
               className="text-primary-fixed/80 hover:text-secondary-fixed transition-colors duration-300 font-medium text-sm hover:underline underline-offset-4"
             >
               Privacy Policy
             </Link>
             <Link
-              to="/terms"
+              to="#"
               className="text-primary-fixed/80 hover:text-secondary-fixed transition-colors duration-300 font-medium text-sm hover:underline underline-offset-4"
             >
               Terms of Service
@@ -221,13 +221,13 @@ export default function Home() {
               Contact Us
             </a>
             <Link
-              to="/dealers/apply"
+              to="#"
               className="text-primary-fixed/80 hover:text-secondary-fixed transition-colors duration-300 font-medium text-sm hover:underline underline-offset-4"
             >
               Fleet Management
             </Link>
             <Link
-              to="/login"
+              to="#"
               className="text-primary-fixed/80 hover:text-secondary-fixed transition-colors duration-300 font-medium text-sm hover:underline underline-offset-4 whitespace-nowrap"
             >
               Partner Sign In
