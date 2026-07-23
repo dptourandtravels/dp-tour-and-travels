@@ -1,7 +1,8 @@
-import { Link, Outlet } from "react-router";
+import { NavLink, Outlet } from "react-router";
 import type { Route } from "./+types/layout";
 import { requireUser } from "../../lib/auth.server";
-import { dashboardPathForRole } from "../../lib/roles";
+import { SidebarShell } from "../../components/sidebar-shell";
+import { getNavGroups } from "../../lib/admin-nav";
 import type { Role } from "../../db/schema";
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -10,18 +11,38 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function CarsLayout({ loaderData }: Route.ComponentProps) {
   return (
-    <main className="max-w-3xl mx-auto pt-16 px-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Cars &amp; payments</h1>
-        <Link to={dashboardPathForRole(loaderData.role as Role)} className="text-sm underline">
-          Back to dashboard
-        </Link>
-      </div>
-      <nav className="flex gap-4 mb-8 text-sm underline">
-        <Link to="/cars">All cars</Link>
-        <Link to="/cars/new">Register car</Link>
+    <SidebarShell user={loaderData} navGroups={getNavGroups(loaderData.role as Role)}>
+      <h1 className="text-2xl font-semibold text-ink mb-6">Cars &amp; payments</h1>
+
+      <nav className="flex gap-2 mb-8">
+        <NavLink
+          to="/cars"
+          end
+          className={({ isActive }) =>
+            `rounded-full px-4 py-2 text-sm transition-colors ${
+              isActive
+                ? "bg-action text-white"
+                : "border border-hairline text-ink hover:border-action hover:text-action"
+            }`
+          }
+        >
+          All cars
+        </NavLink>
+        <NavLink
+          to="/cars/new"
+          className={({ isActive }) =>
+            `rounded-full px-4 py-2 text-sm transition-colors ${
+              isActive
+                ? "bg-action text-white"
+                : "border border-hairline text-ink hover:border-action hover:text-action"
+            }`
+          }
+        >
+          Register car
+        </NavLink>
       </nav>
+
       <Outlet />
-    </main>
+    </SidebarShell>
   );
 }
