@@ -46,51 +46,43 @@ export async function action({ request }: Route.ActionArgs) {
   return data({ created: result });
 }
 
-const inputClass =
-  "border border-hairline rounded-[11px] px-4 py-[11px] bg-surface-pearl text-ink text-body-apple focus:outline-none focus:ring-2 focus:ring-action/30 focus:border-action transition-all";
-
 export default function NewCar({ actionData }: Route.ComponentProps) {
   if (actionData && "created" in actionData) {
     const { client, clientPassword } = actionData.created;
     return (
-      <div className="max-w-md rounded-[18px] border border-hairline bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-        <p className="text-tagline text-ink mb-4">Car registered and payout scheduled.</p>
+      <div>
+        <p className="mb-2">Car registered and payout scheduled.</p>
         {clientPassword && (
-          <div className="rounded-lg bg-surface-pearl border border-hairline px-4 py-3">
-            <p className="text-label-sm text-ink-muted-48 uppercase tracking-wide mb-1">New client login</p>
-            <p className="font-mono text-sm text-ink">
-              {client.email} / {clientPassword}
-            </p>
-          </div>
+          <p className="font-mono bg-gray-100 dark:bg-gray-800 rounded px-3 py-2 inline-block">
+            New client login: {client.email} / {clientPassword}
+          </p>
         )}
       </div>
     );
   }
 
   return (
-    <Form method="post" className="flex flex-col gap-4 max-w-md rounded-[18px] border border-hairline bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-      <input name="clientEmail" type="email" placeholder="Client email" required className={inputClass} />
-      <input name="clientName" placeholder="Client name" required className={inputClass} />
-      <input name="make" placeholder="Make" required className={inputClass} />
-      <input name="model" placeholder="Model" required className={inputClass} />
-      <input name="registrationNumber" placeholder="Registration number" required className={inputClass} />
-      <label className="flex flex-col gap-2">
-        <span className="text-label-sm text-ink font-medium">Receipt date</span>
-        <input name="receiptDate" type="date" required className={inputClass} />
+    <Form method="post" className="flex flex-col gap-4 max-w-sm">
+      <input name="clientEmail" type="email" placeholder="Client email" required className="border rounded px-3 py-2" />
+      <input name="clientName" placeholder="Client name" required className="border rounded px-3 py-2" />
+      <input name="make" placeholder="Make" required className="border rounded px-3 py-2" />
+      <input name="model" placeholder="Model" required className="border rounded px-3 py-2" />
+      <input
+        name="registrationNumber"
+        placeholder="Registration number"
+        required
+        className="border rounded px-3 py-2"
+      />
+      <label className="text-sm flex flex-col gap-1">
+        Receipt date
+        <input name="receiptDate" type="date" required className="border rounded px-3 py-2" />
       </label>
-      <label className="flex flex-col gap-2">
-        <span className="text-label-sm text-ink font-medium">Payout amount (₹)</span>
-        <input name="amount" type="number" min="1" required className={inputClass} />
+      <label className="text-sm flex flex-col gap-1">
+        Payout amount (₹)
+        <input name="amount" type="number" min="1" required className="border rounded px-3 py-2" />
       </label>
-      {actionData && "error" in actionData && (
-        <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-          {actionData.error}
-        </p>
-      )}
-      <button
-        type="submit"
-        className="mt-2 bg-action text-white text-body-apple font-medium rounded-full px-4 py-[13px] hover:bg-action-focus active:scale-95 transition-all w-full"
-      >
+      {actionData && "error" in actionData && <p className="text-red-600 text-sm">{actionData.error}</p>}
+      <button type="submit" className="bg-black text-white rounded px-3 py-2">
         Register car
       </button>
     </Form>
