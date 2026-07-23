@@ -1,9 +1,7 @@
-import { useState, type FormEvent } from "react";
-import { data, Link, redirect } from "react-router";
+import { data, Form, Link, redirect } from "react-router";
 import type { Route } from "./+types/login";
 import { findUserByEmail, verifyPassword, createSession, getSessionUser, dashboardPathForRole } from "../lib/auth.server";
 import { type Role } from "../db/schema";
-import { DemoPopup } from "../components/demo-popup";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Sign In — DP Tour & Travels" }];
@@ -31,22 +29,7 @@ export async function action({ request }: Route.ActionArgs) {
   });
 }
 
-export default function Login(_: Route.ComponentProps) {
-  const [popup, setPopup] = useState<{ ok: boolean; message: string } | null>(null);
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const email = String(form.get("email") ?? "");
-    const password = String(form.get("password") ?? "");
-
-    if (email === "admin" && password === "admin") {
-      setPopup({ ok: true, message: "You're signed in as admin." });
-    } else {
-      setPopup({ ok: false, message: "Invalid credentials — try admin / admin." });
-    }
-  }
-
+export default function Login({ actionData }: Route.ComponentProps) {
   return (
     <div className="min-h-screen flex flex-col bg-canvas-parchment font-sans">
       {/* Simple Minimal Nav */}
@@ -73,24 +56,25 @@ export default function Login(_: Route.ComponentProps) {
           </div>
 
           <div className="bg-white border border-hairline rounded-[18px] p-8 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <Form method="post" className="flex flex-col gap-5">
+              {actionData?.error && (
+                <p className="text-sm text-red-600">{actionData.error}</p>
+              )}
               <label className="flex flex-col gap-2">
                 <span className="text-label-sm text-ink font-medium">Email</span>
                 <input
                   name="email"
                   type="text"
-                  placeholder="admin"
                   required
                   className="text-body-apple text-ink border border-hairline rounded-[11px] px-4 py-[11px] bg-surface-pearl focus:outline-none focus:ring-2 focus:ring-action/30 focus:border-action transition-all"
                 />
               </label>
-              
+
               <label className="flex flex-col gap-2">
                 <span className="text-label-sm text-ink font-medium">Password</span>
                 <input
                   name="password"
                   type="password"
-                  placeholder="admin"
                   required
                   className="text-body-apple text-ink border border-hairline rounded-[11px] px-4 py-[11px] bg-surface-pearl focus:outline-none focus:ring-2 focus:ring-action/30 focus:border-action transition-all"
                 />
@@ -102,7 +86,7 @@ export default function Login(_: Route.ComponentProps) {
               >
                 Sign in
               </button>
-            </form>
+            </Form>
 
             <div className="mt-8 pt-6 border-t border-hairline">
               <div className="flex items-center justify-between">
@@ -122,15 +106,6 @@ export default function Login(_: Route.ComponentProps) {
             </div>
           </div>
         </div>
-
-        {popup && (
-          <DemoPopup
-            ok={popup.ok}
-            title={popup.ok ? "Sign in is working" : "Sign in failed"}
-            message={popup.message}
-            onClose={() => setPopup(null)}
-          />
-        )}
       </div>
     </div>
   );
