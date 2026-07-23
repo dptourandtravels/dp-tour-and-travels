@@ -15,8 +15,8 @@ export default function CarsLayout({ loaderData }: Route.ComponentProps) {
       <h1 className="text-2xl font-semibold mb-6">Cars &amp; payments</h1>
 
       <nav className="flex gap-4 mb-8 text-sm underline">
-        <Link to="/cars">All cars</Link>
-        <Link to="/cars/new">Register car</Link>
+        <Link to="/superadmin/cars">All cars</Link>
+        <Link to="/superadmin/cars/new">Register car</Link>
       </nav>
 
       <Outlet />

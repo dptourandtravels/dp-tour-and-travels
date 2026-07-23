@@ -92,7 +92,7 @@ export default function SuperadminDashboard({ loaderData }: Route.ComponentProps
           New agreement
         </Link>
         <Link
-          to="/cars/new"
+          to="/superadmin/cars/new"
           className="rounded-full border border-hairline px-4 py-2 text-sm text-ink hover:border-action hover:text-action transition-colors"
         >
           Add car
@@ -101,7 +101,7 @@ export default function SuperadminDashboard({ loaderData }: Route.ComponentProps
 
       <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
         <StatTile
-          to="/cars"
+          to="/superadmin/cars"
           label="Overdue payments"
           value={loaderData.overduePayments}
           detail="Payments marked red"
@@ -118,7 +118,7 @@ export default function SuperadminDashboard({ loaderData }: Route.ComponentProps
           label="Dealer applications"
           value={loaderData.dealerApplications}
         />
-        <StatTile to="/cars" label="Cars on lease" value={loaderData.totalCars} />
+        <StatTile to="/superadmin/cars" label="Cars on lease" value={loaderData.totalCars} />
         <StatTile
           to="/superadmin/users"
           label="Total users"

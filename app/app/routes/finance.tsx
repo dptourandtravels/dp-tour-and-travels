@@ -10,7 +10,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 export default function FinanceDashboard({ loaderData }: Route.ComponentProps) {
   return (
     <DashboardShell title="Finance dashboard" name={loaderData.name} email={loaderData.email}>
-      <Link to="/cars" className="block mt-4 text-sm underline">
+      <Link to="/superadmin/cars" className="block mt-4 text-sm underline">
         Cars &amp; payments
       </Link>
       <Link to="/agreements/new" className="block mt-2 text-sm underline">

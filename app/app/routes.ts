@@ -21,7 +21,7 @@ export default [
     route("dealer-applications", "routes/superadmin/dealer-applications.tsx"),
     route("dealer-stock-requests", "routes/superadmin/dealer-stock-requests.tsx"),
   ]),
-  route("cars", "routes/cars/layout.tsx", [
+  route("superadmin/cars", "routes/cars/layout.tsx", [
     index("routes/cars/list.tsx"),
     route("new", "routes/cars/new.tsx"),
   ]),
