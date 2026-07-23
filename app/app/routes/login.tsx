@@ -48,99 +48,89 @@ export default function Login(_: Route.ComponentProps) {
   }
 
   return (
-    <div className="min-h-screen w-full flex bg-surface">
-      {/* Brand panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-primary text-white flex-col justify-between p-16">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-3xl -translate-y-1/3 translate-x-1/4 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-secondary-container/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4 pointer-events-none"></div>
-
-        <Link to="/" className="relative z-10 flex items-center gap-3 w-fit">
-          <div className="w-8 h-8 rounded bg-gradient-to-tr from-secondary to-yellow-400 shrink-0"></div>
-          <span className="font-headline-md text-headline-md font-bold tracking-tight">DP Tour &amp; Travels</span>
-        </Link>
-
-        <div className="relative z-10 max-w-md">
-          <h1 className="font-display-lg text-4xl font-extrabold tracking-tight leading-[1.15] mb-6">
-            We don&apos;t build businesses, we build{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary-fixed to-yellow-300">
-              relationships.
-            </span>
-          </h1>
-          <p className="font-body-lg text-lg text-primary-fixed/70 leading-relaxed">
-            Sign in to manage your cars, agreements, and payouts — or your dealer fleet — from one place.
-          </p>
+    <div className="min-h-screen flex flex-col bg-canvas-parchment font-sans">
+      {/* Simple Minimal Nav */}
+      <div className="w-full bg-[rgba(245,245,247,0.8)] backdrop-blur-xl border-b border-black/[0.08] sticky top-0 z-50">
+        <div className="max-w-[1440px] mx-auto h-[52px] flex items-center justify-between px-6 md:px-8">
+          <Link to="/" className="flex items-center gap-2 text-ink">
+            <img src="/dp-logo-mark.png" alt="" className="w-7 h-7 object-contain shrink-0" />
+            <span className="text-tagline whitespace-nowrap">DP Tour &amp; Travels</span>
+          </Link>
+          <Link to="/get-started" className="text-ink text-sm tracking-tight hover:text-action transition-colors">
+            Create an account
+          </Link>
         </div>
-
-        <p className="relative z-10 font-body-md text-sm text-primary-fixed/50">
-          © {new Date().getFullYear()} DP Tour and Travels
-        </p>
       </div>
 
-      {/* Form panel */}
-      <div className="flex-1 flex items-center justify-center px-6 py-16">
-        <div className="w-full max-w-sm">
-          <Link to="/" className="lg:hidden flex items-center gap-3 mb-12 w-fit">
-            <div className="w-7 h-7 rounded bg-gradient-to-tr from-secondary to-yellow-400 shrink-0"></div>
-            <span className="font-headline-md text-lg font-bold text-primary tracking-tight">DP Tour &amp; Travels</span>
-          </Link>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-10">
+            <h1 className="text-tile-heading text-ink mb-3">Welcome back</h1>
+            <p className="text-body-apple text-ink-muted-80">
+              Sign in to your account to continue.
+            </p>
+          </div>
 
-          <h2 className="font-headline-md text-3xl font-bold text-primary tracking-tight mb-2">Welcome back</h2>
-          <p className="font-body-md text-on-surface-variant mb-10">Sign in to your account to continue.</p>
+          <div className="bg-white border border-hairline rounded-[18px] p-8 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              <label className="flex flex-col gap-2">
+                <span className="text-label-sm text-ink font-medium">Email</span>
+                <input
+                  name="email"
+                  type="text"
+                  placeholder="admin"
+                  required
+                  className="text-body-apple text-ink border border-hairline rounded-[11px] px-4 py-[11px] bg-surface-pearl focus:outline-none focus:ring-2 focus:ring-action/30 focus:border-action transition-all"
+                />
+              </label>
+              
+              <label className="flex flex-col gap-2">
+                <span className="text-label-sm text-ink font-medium">Password</span>
+                <input
+                  name="password"
+                  type="password"
+                  placeholder="admin"
+                  required
+                  className="text-body-apple text-ink border border-hairline rounded-[11px] px-4 py-[11px] bg-surface-pearl focus:outline-none focus:ring-2 focus:ring-action/30 focus:border-action transition-all"
+                />
+              </label>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            <label className="flex flex-col gap-1.5">
-              <span className="font-label-md text-label-md text-on-surface-variant">Email</span>
-              <input
-                name="email"
-                type="text"
-                placeholder="admin"
-                required
-                className="rounded-xl border border-outline-variant bg-white px-4 py-3 font-body-md text-body-md text-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-              />
-            </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="font-label-md text-label-md text-on-surface-variant">Password</span>
-              <input
-                name="password"
-                type="password"
-                placeholder="admin"
-                required
-                className="rounded-xl border border-outline-variant bg-white px-4 py-3 font-body-md text-body-md text-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-              />
-            </label>
+              <button
+                type="submit"
+                className="mt-4 bg-action text-white text-body-apple font-medium rounded-full px-4 py-[13px] hover:bg-action-focus active:scale-95 transition-all w-full"
+              >
+                Sign in
+              </button>
+            </form>
 
-            <button
-              type="submit"
-              className="mt-2 rounded-xl bg-primary text-white py-3.5 font-label-md text-label-md font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
-            >
-              Sign in
-            </button>
-          </form>
-
-          {popup && (
-            <DemoPopup
-              ok={popup.ok}
-              title={popup.ok ? "Sign in is working" : "Sign in failed"}
-              message={popup.message}
-              onClose={() => setPopup(null)}
-            />
-          )}
-
-          <div className="flex items-center justify-between mt-6">
-            <Link
-              to="/forgot-password"
-              className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors"
-            >
-              Forgot password?
-            </Link>
-            <Link
-              to="#"
-              className="font-label-md text-label-md text-secondary font-semibold hover:underline underline-offset-4"
-            >
-              Create an account
-            </Link>
+            <div className="mt-8 pt-6 border-t border-hairline">
+              <div className="flex items-center justify-between">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-ink-muted-80 hover:text-action transition-colors"
+                >
+                  Forgot password?
+                </Link>
+                <Link
+                  to="/get-started"
+                  className="text-sm text-action font-semibold hover:underline underline-offset-4 transition-all"
+                >
+                  Create an account
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
+
+        {popup && (
+          <DemoPopup
+            ok={popup.ok}
+            title={popup.ok ? "Sign in is working" : "Sign in failed"}
+            message={popup.message}
+            onClose={() => setPopup(null)}
+          />
+        )}
       </div>
     </div>
   );

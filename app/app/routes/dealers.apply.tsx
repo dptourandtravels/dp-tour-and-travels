@@ -23,27 +23,17 @@ export async function action({ request }: Route.ActionArgs) {
 
 function Nav() {
   return (
-    <div className="sticky top-0 z-50 w-full">
-      <div className="w-full bg-black">
-        <div className="max-w-[1440px] mx-auto h-[34px] flex items-center justify-between px-6 md:px-8">
-          <nav className="flex items-center gap-5">
-            <Link to="/" className="text-white text-xs tracking-tight hover:text-white/70 transition-colors">Home</Link>
-            <Link to="/#owners" className="text-white text-xs tracking-tight hover:text-white/70 transition-colors">About us</Link>
-          </nav>
-          <Link to="/login" className="text-white text-xs tracking-tight hover:text-white/70 transition-colors">Login</Link>
-        </div>
-      </div>
-      <div className="w-full bg-[rgba(245,245,247,0.8)] backdrop-blur-xl border-b border-black/[0.08]">
-        <div className="max-w-[1440px] mx-auto h-[52px] flex items-center justify-between px-6 md:px-8">
-          <Link to="/" className="text-tagline text-ink">DP Tour &amp; Travels</Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link to="/#owners" className="text-ink text-sm tracking-tight hover:text-action transition-colors">For owners</Link>
-            <Link to="/#dealers" className="text-ink text-sm tracking-tight hover:text-action transition-colors">For dealers</Link>
-            <a href="#apply" className="bg-action text-white text-sm rounded-full px-[18px] py-2.5 hover:bg-action-focus active:scale-95 transition-all">
-              Apply now
-            </a>
-          </nav>
-        </div>
+    <div className="sticky top-0 z-50 w-full bg-[rgba(245,245,247,0.8)] backdrop-blur-xl border-b border-black/[0.08]">
+      <div className="max-w-[1440px] mx-auto h-[52px] flex items-center justify-between px-6 md:px-8">
+        <Link to="/" className="text-tagline text-ink">DP Tour &amp; Travels</Link>
+        <nav className="hidden md:flex items-center gap-6">
+          <Link to="/#owners" className="text-ink text-sm tracking-tight hover:text-action transition-colors">For owners</Link>
+          <Link to="/#dealers" className="text-ink text-sm tracking-tight hover:text-action transition-colors">For dealers</Link>
+          <Link to="/login" className="text-ink text-sm tracking-tight hover:text-action transition-colors">Login</Link>
+          <a href="#apply" className="bg-action text-white text-sm rounded-full px-[18px] py-2.5 hover:bg-action-focus active:scale-95 transition-all">
+            Apply now
+          </a>
+        </nav>
       </div>
     </div>
   );
