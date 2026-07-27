@@ -1,20 +1,24 @@
 import { eq } from "drizzle-orm";
-import { Link } from "react-router";
+import { data, Link } from "react-router";
 import type { Route } from "./+types/dashboard";
 import { requireUser, db } from "../../lib/auth.server";
 import { users, cars, payments, carRequirements, dealerApplications, dealerStockRequests, roles, type Role } from "../../db/schema";
+import { listNotificationsForUser, markAllNotificationsRead } from "../../lib/notifications.server";
+import { NotificationsPanel } from "../../components/notifications-panel";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  await requireUser(request, ["superadmin"]);
+  const actor = await requireUser(request, ["superadmin"]);
 
-  const [allUsers, allCars, overduePayments, openRequirements, applications, openStockRequests] = await Promise.all([
-    db.select({ role: users.role }).from(users),
-    db.select({ id: cars.id }).from(cars),
-    db.select({ id: payments.id }).from(payments).where(eq(payments.status, "red")),
-    db.select({ id: carRequirements.id }).from(carRequirements).where(eq(carRequirements.status, "open")),
-    db.select({ id: dealerApplications.id }).from(dealerApplications),
-    db.select({ id: dealerStockRequests.id }).from(dealerStockRequests).where(eq(dealerStockRequests.status, "open")),
-  ]);
+  const [allUsers, allCars, overduePayments, openRequirements, applications, openStockRequests, notifications] =
+    await Promise.all([
+      db.select({ role: users.role }).from(users),
+      db.select({ id: cars.id }).from(cars),
+      db.select({ id: payments.id }).from(payments).where(eq(payments.status, "red")),
+      db.select({ id: carRequirements.id }).from(carRequirements).where(eq(carRequirements.status, "open")),
+      db.select({ id: dealerApplications.id }).from(dealerApplications),
+      db.select({ id: dealerStockRequests.id }).from(dealerStockRequests).where(eq(dealerStockRequests.status, "open")),
+      listNotificationsForUser(actor.id),
+    ]);
 
   const usersByRole = Object.fromEntries(
     roles.map((role) => [role, allUsers.filter((u) => u.role === role).length]),
@@ -28,7 +32,14 @@ export async function loader({ request }: Route.LoaderArgs) {
     openRequirements: openRequirements.length,
     dealerApplications: applications.length,
     openStockRequests: openStockRequests.length,
+    notifications,
   };
+}
+
+export async function action({ request }: Route.ActionArgs) {
+  const actor = await requireUser(request, ["superadmin"]);
+  await markAllNotificationsRead(actor.id);
+  return data({ success: true as const });
 }
 
 function StatTile({
@@ -125,6 +136,11 @@ export default function SuperadminDashboard({ loaderData }: Route.ComponentProps
           value={loaderData.totalUsers}
           detail={roles.map((r) => `${usersByRole[r]} ${r}`).join(" · ")}
         />
+      </div>
+
+      <div>
+        <h2 className="text-lg font-semibold text-ink mb-3">Notifications</h2>
+        <NotificationsPanel rows={loaderData.notifications} formAction="?index" />
       </div>
     </div>
   );

@@ -12,22 +12,26 @@ export function DashboardShell({
   children?: React.ReactNode;
 }) {
   return (
-    <main className="max-w-2xl mx-auto pt-16 px-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">{title}</h1>
-        <Form method="post" action="/logout">
-          <button type="submit" className="text-sm underline">
-            Sign out
-          </button>
-        </Form>
-      </div>
-      <p>
-        Signed in as {name} ({email}).
-      </p>
-      <Link to="/notifications" className="block mt-2 text-sm underline">
-        Notifications
-      </Link>
-      {children}
-    </main>
+    <div className="min-h-screen bg-canvas-parchment font-sans">
+      <main className="max-w-2xl mx-auto pt-16 px-4 pb-16">
+        <div className="flex justify-between items-center pb-6 mb-6 border-b border-hairline">
+          <div>
+            <h1 className="text-2xl font-semibold text-ink">{title}</h1>
+            <p className="text-sm text-ink-muted-80 mt-1">
+              Signed in as {name} ({email})
+            </p>
+          </div>
+          <Form method="post" action="/logout">
+            <button type="submit" className="text-sm text-ink-muted-80 hover:text-action transition-colors">
+              Sign out
+            </button>
+          </Form>
+        </div>
+        <Link to="/notifications" className="inline-block mb-6 text-sm text-action hover:underline">
+          Notifications
+        </Link>
+        {children}
+      </main>
+    </div>
   );
 }

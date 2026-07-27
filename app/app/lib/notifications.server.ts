@@ -1,3 +1,4 @@
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { db } from "./auth.server";
 import { notifications, type NotificationType } from "../db/schema";
 
@@ -15,4 +16,19 @@ export async function notifyUser(
     readAt: null,
     createdAt,
   });
+}
+
+export async function listNotificationsForUser(userId: string) {
+  return db
+    .select()
+    .from(notifications)
+    .where(eq(notifications.userId, userId))
+    .orderBy(desc(notifications.createdAt));
+}
+
+export async function markAllNotificationsRead(userId: string) {
+  await db
+    .update(notifications)
+    .set({ readAt: new Date() })
+    .where(and(eq(notifications.userId, userId), isNull(notifications.readAt)));
 }

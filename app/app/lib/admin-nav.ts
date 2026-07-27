@@ -21,7 +21,6 @@ const SUPERADMIN_NAV: NavGroup[] = [
     items: [
       { to: "/cars", label: "Cars & payments" },
       { to: "/agreements/new", label: "New agreement" },
-      { to: "/notifications", label: "Notifications" },
     ],
   },
   {
@@ -45,7 +44,6 @@ const FINANCE_NAV: NavGroup[] = [
     items: [
       { to: "/cars", label: "Cars & payments" },
       { to: "/agreements/new", label: "New agreement" },
-      { to: "/notifications", label: "Notifications" },
     ],
   },
 ];

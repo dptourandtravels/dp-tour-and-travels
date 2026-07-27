@@ -47,26 +47,26 @@ export default function ClientDashboard({ loaderData, actionData }: Route.Compon
   return (
     <DashboardShell title="Client dashboard" name={user.name} email={user.email}>
       <section className="mt-8">
-        <h2 className="text-lg font-semibold mb-2">Your cars</h2>
+        <h2 className="text-lg font-semibold text-ink mb-3">Your cars</h2>
         {cars.length === 0 ? (
-          <p className="text-sm text-gray-500">No cars registered yet.</p>
+          <p className="text-sm text-ink-muted-48">No cars registered yet.</p>
         ) : (
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="text-left border-b">
-                <th className="py-2">Car</th>
-                <th className="py-2">Registered on</th>
-                <th className="py-2">Payment status</th>
-                <th className="py-2">Method</th>
+              <tr className="text-left border-b border-hairline text-ink-muted-48">
+                <th className="py-2 font-medium">Car</th>
+                <th className="py-2 font-medium">Registered on</th>
+                <th className="py-2 font-medium">Payment status</th>
+                <th className="py-2 font-medium">Method</th>
               </tr>
             </thead>
             <tbody>
               {cars.map(({ car, payment }) => (
-                <tr key={car.id} className="border-b">
+                <tr key={car.id} className="border-b border-hairline text-ink">
                   <td className="py-2">
                     {car.make} {car.model}
                     <br />
-                    {car.registrationNumber}
+                    <span className="text-ink-muted-80">{car.registrationNumber}</span>
                   </td>
                   <td className="py-2">{new Date(car.receiptDate).toLocaleDateString()}</td>
                   <td className="py-2">
@@ -83,22 +83,27 @@ export default function ClientDashboard({ loaderData, actionData }: Route.Compon
       </section>
 
       <section className="mt-8">
-        <h2 className="text-lg font-semibold mb-2">Documents</h2>
+        <h2 className="text-lg font-semibold text-ink mb-3">Documents</h2>
         {actionData && "error" in actionData && <p className="text-red-600 text-sm mb-2">{actionData.error}</p>}
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col">
           {documents.map(({ type, doc }) => (
-            <li key={type} className="flex items-center justify-between border-b pb-2">
-              <span>{docLabels[type]}</span>
+            <li key={type} className="flex items-center justify-between border-b border-hairline py-3">
+              <span className="text-ink">{docLabels[type]}</span>
               <div className="flex items-center gap-3">
                 {doc && (
-                  <a href={`/client/documents/${type}`} target="_blank" rel="noreferrer" className="text-xs underline">
+                  <a
+                    href={`/client/documents/${type}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs text-action hover:underline"
+                  >
                     View
                   </a>
                 )}
                 <Form method="post" encType="multipart/form-data" className="flex items-center gap-2">
                   <input type="hidden" name="docType" value={type} />
-                  <input type="file" name="file" required className="text-xs" />
-                  <button type="submit" className="text-xs underline">
+                  <input type="file" name="file" required className="text-xs text-ink-muted-80" />
+                  <button type="submit" className="text-xs text-action hover:underline">
                     {doc ? "Replace" : "Upload"}
                   </button>
                 </Form>
@@ -109,17 +114,22 @@ export default function ClientDashboard({ loaderData, actionData }: Route.Compon
       </section>
 
       <section className="mt-8">
-        <h2 className="text-lg font-semibold mb-2">Agreements</h2>
+        <h2 className="text-lg font-semibold text-ink mb-3">Agreements</h2>
         {agreements.length === 0 ? (
-          <p className="text-sm text-gray-500">No agreements issued yet.</p>
+          <p className="text-sm text-ink-muted-48">No agreements issued yet.</p>
         ) : (
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col">
             {agreements.map((a) => (
-              <li key={a.id} className="flex items-center justify-between border-b pb-2">
-                <span>
+              <li key={a.id} className="flex items-center justify-between border-b border-hairline py-3">
+                <span className="text-ink">
                   {a.carDescription} — {a.registrationNumber}
                 </span>
-                <a href={`/agreements/${a.id}/download`} target="_blank" rel="noreferrer" className="text-xs underline">
+                <a
+                  href={`/agreements/${a.id}/download`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-action hover:underline"
+                >
                   View / Download
                 </a>
               </li>
