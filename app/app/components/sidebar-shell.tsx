@@ -47,7 +47,7 @@ export function SidebarShell({
   return (
     <div className="min-h-screen flex bg-canvas-parchment font-sans">
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-60 shrink-0 flex-col border-r border-hairline bg-surface-pearl px-4 py-6">
+      <aside className="hidden md:flex w-72 shrink-0 flex-col border-r border-hairline bg-surface-pearl px-4 py-6">
         <Link to="/" className="flex items-center gap-2 text-ink px-3 mb-8">
           <img src="/dp-logo-mark.png" alt="" className="w-7 h-7 object-contain shrink-0" />
           <span className="text-tagline whitespace-nowrap">DP Tour &amp; Travels</span>
