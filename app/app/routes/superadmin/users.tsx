@@ -1,13 +1,13 @@
 import { desc, eq } from "drizzle-orm";
 import { data, Form } from "react-router";
 import type { Route } from "./+types/users";
-import { requireUser, db, updateUserRole } from "../../lib/auth.server";
+import { requireUser, db, updateUserRole, publicUserColumns } from "../../lib/auth.server";
 import { users, roles, type Role } from "../../db/schema";
 import { logAudit } from "../../lib/audit.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
   await requireUser(request, ["superadmin"]);
-  const rows = await db.select().from(users).orderBy(desc(users.createdAt));
+  const rows = await db.select(publicUserColumns).from(users).orderBy(desc(users.createdAt));
   return { users: rows };
 }
 

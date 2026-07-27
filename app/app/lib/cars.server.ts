@@ -1,5 +1,5 @@
 import { desc, eq } from "drizzle-orm";
-import { db, getOrCreateClient } from "./auth.server";
+import { db, getOrCreateClient, publicUserColumns } from "./auth.server";
 import { cars, payments, users, type PaymentMethod } from "../db/schema";
 import { computeDueDate, computeStatus } from "./payments";
 import { notifyUser } from "./notifications.server";
@@ -90,7 +90,7 @@ async function syncPaymentStatuses(rows: { payment: typeof payments.$inferSelect
 
 export async function listCarsWithPayments() {
   const rows = await db
-    .select({ car: cars, payment: payments, client: users })
+    .select({ car: cars, payment: payments, client: publicUserColumns })
     .from(cars)
     .innerJoin(payments, eq(payments.carId, cars.id))
     .innerJoin(users, eq(users.id, cars.clientId))

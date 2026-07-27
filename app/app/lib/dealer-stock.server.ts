@@ -1,5 +1,5 @@
 import { desc, eq } from "drizzle-orm";
-import { db } from "./auth.server";
+import { db, publicUserColumns } from "./auth.server";
 import { cars, users, dealerStockRequests } from "../db/schema";
 import { notifyUser } from "./notifications.server";
 
@@ -19,7 +19,7 @@ export async function listStockOverview() {
 
 export async function listAssignedCarsForDealer(dealerId: string) {
   return db
-    .select({ car: cars, client: users })
+    .select({ car: cars, client: publicUserColumns })
     .from(cars)
     .innerJoin(users, eq(users.id, cars.clientId))
     .where(eq(cars.dealerId, dealerId))
@@ -55,7 +55,7 @@ export async function listStockRequestsForDealer(dealerId: string) {
 
 export async function listAllStockRequests() {
   return db
-    .select({ request: dealerStockRequests, dealer: users })
+    .select({ request: dealerStockRequests, dealer: publicUserColumns })
     .from(dealerStockRequests)
     .innerJoin(users, eq(users.id, dealerStockRequests.dealerId))
     .orderBy(desc(dealerStockRequests.createdAt));

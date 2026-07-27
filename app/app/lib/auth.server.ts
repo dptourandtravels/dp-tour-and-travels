@@ -14,6 +14,19 @@ const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 export const db = drizzle(env.DB);
 
+export const publicUserColumns = {
+  id: users.id,
+  email: users.email,
+  name: users.name,
+  role: users.role,
+  createdAt: users.createdAt,
+} as const;
+
+function toPublicUser<T extends { passwordHash: string }>(user: T): Omit<T, "passwordHash"> {
+  const { passwordHash: _passwordHash, ...publicUser } = user;
+  return publicUser;
+}
+
 export async function findUserByEmail(email: string) {
   const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
   return user ?? null;
@@ -48,7 +61,7 @@ export async function getSessionUser(request: Request) {
   if (!sessionId) return null;
 
   const rows = await db
-    .select({ user: users, expiresAt: sessions.expiresAt })
+    .select({ user: publicUserColumns, expiresAt: sessions.expiresAt })
     .from(sessions)
     .innerJoin(users, eq(sessions.userId, users.id))
     .where(eq(sessions.id, sessionId))
@@ -104,7 +117,7 @@ export async function createStaffUser(
 }
 
 export async function listUsersByRole(role: Role) {
-  return db.select().from(users).where(eq(users.role, role));
+  return db.select(publicUserColumns).from(users).where(eq(users.role, role));
 }
 
 export async function updateUserRole(userId: string, role: Role) {
@@ -114,9 +127,10 @@ export async function updateUserRole(userId: string, role: Role) {
 export async function getOrCreateClient(email: string, name: string) {
   const normalizedEmail = email.trim().toLowerCase();
   const existing = await findUserByEmail(normalizedEmail);
-  if (existing) return { user: existing, password: null };
+  if (existing) return { user: toPublicUser(existing), password: null };
 
-  return insertUser(normalizedEmail, name.trim(), "client");
+  const { user, password } = await insertUser(normalizedEmail, name.trim(), "client");
+  return { user: toPublicUser(user), password };
 }
 
 export async function signUpClient(input: { email: string; name: string; password: string }) {
