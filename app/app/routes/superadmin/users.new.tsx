@@ -25,28 +25,58 @@ export async function action({ request }: Route.ActionArgs) {
 export default function NewUser({ actionData }: Route.ComponentProps) {
   if (actionData && "created" in actionData) {
     return (
-      <div>
-        <p className="mb-2">Account created. Share this password with the user now — it won't be shown again:</p>
-        <p className="font-mono bg-gray-100 dark:bg-gray-800 rounded px-3 py-2 inline-block">
-          {actionData.created.email} / {actionData.created.password}
-        </p>
+      <div className="p-8 max-w-lg">
+        <h1 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">Account Created</h1>
+        <div className="bg-green-50 border border-green-200 dark:bg-green-900/20 dark:border-green-800 rounded-lg p-6">
+          <p className="mb-4 text-green-800 dark:text-green-200 font-medium">Share these credentials with the user now — the password won't be shown again:</p>
+          <div className="space-y-2">
+            <p className="flex justify-between items-center"><span className="text-gray-600 dark:text-gray-400">Email:</span> <strong className="font-mono bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded">{actionData.created.email}</strong></p>
+            <p className="flex justify-between items-center"><span className="text-gray-600 dark:text-gray-400">Password:</span> <strong className="font-mono bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded">{actionData.created.password}</strong></p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <Form method="post" className="flex flex-col gap-4 max-w-sm">
-      <input name="name" placeholder="Full name" required className="border rounded px-3 py-2" />
-      <input name="email" type="email" placeholder="Email" required className="border rounded px-3 py-2" />
-      <select name="role" required className="border rounded px-3 py-2">
-        <option value="">Select role</option>
-        <option value="superadmin">Superadmin</option>
-        <option value="finance">Finance</option>
-      </select>
-      {actionData && "error" in actionData && <p className="text-red-600 text-sm">{actionData.error}</p>}
-      <button type="submit" className="bg-black text-white rounded px-3 py-2">
-        Create account
-      </button>
-    </Form>
+    <div className="p-8">
+      <div className="max-w-md">
+        <h1 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">Create new account</h1>
+        <p className="text-gray-500 dark:text-gray-400 mb-8">Add a new staff member to the system.</p>
+        
+        <Form method="post" className="flex flex-col gap-5">
+          <div className="space-y-1.5">
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Full name</label>
+            <input id="name" name="name" placeholder="John Doe" required className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent shadow-sm" />
+          </div>
+          
+          <div className="space-y-1.5">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email address</label>
+            <input id="email" name="email" type="email" placeholder="john@example.com" required className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent shadow-sm" />
+          </div>
+          
+          <div className="space-y-1.5">
+            <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
+            <select id="role" name="role" required defaultValue="" className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent shadow-sm">
+              <option value="" disabled>Select a role...</option>
+              <option value="superadmin">Superadmin</option>
+              <option value="finance">Finance</option>
+            </select>
+          </div>
+          
+          {actionData && "error" in actionData && (
+            <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-md mt-2">
+              <p className="text-red-600 dark:text-red-400 text-sm font-medium">{actionData.error}</p>
+            </div>
+          )}
+          
+          <div className="pt-4">
+            <button type="submit" className="w-full bg-black dark:bg-white text-white dark:text-black font-medium rounded-md px-4 py-2 hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-sm">
+              Create account
+            </button>
+          </div>
+        </Form>
+      </div>
+    </div>
   );
 }
