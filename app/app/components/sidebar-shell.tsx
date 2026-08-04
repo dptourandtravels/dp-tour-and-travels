@@ -45,7 +45,7 @@ export function SidebarShell({
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex bg-canvas-parchment font-sans">
+    <div className="min-h-screen flex bg-canvas-parchment font-sans text-ink">
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-72 shrink-0 flex-col border-r border-hairline bg-surface-pearl px-4 py-6">
         <Link to="/" className="flex items-center gap-2 text-ink px-3 mb-8">

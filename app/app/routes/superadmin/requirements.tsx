@@ -39,19 +39,19 @@ export default function Requirements({ loaderData, actionData }: Route.Component
     <div className="flex flex-col gap-8">
       <Form method="post" className="flex flex-col gap-4 max-w-sm">
         <h2 className="font-semibold">Add requirement</h2>
-        <input name="title" placeholder="Vehicle model (e.g. Maruti Suzuki Brezza)" required className="border rounded px-3 py-2" />
-        <input name="color" placeholder="Color (optional)" className="border rounded px-3 py-2" />
-        <input name="quantity" type="number" min="1" placeholder="Qty required (optional)" className="border rounded px-3 py-2" />
-        <textarea name="description" placeholder="Description (optional)" className="border rounded px-3 py-2" />
+        <input name="title" placeholder="Vehicle model (e.g. Maruti Suzuki Brezza)" required className="border border-hairline bg-white rounded-lg px-3 py-2 outline-none focus:border-action transition-colors" />
+        <input name="color" placeholder="Color (optional)" className="border border-hairline bg-white rounded-lg px-3 py-2 outline-none focus:border-action transition-colors" />
+        <input name="quantity" type="number" min="1" placeholder="Qty required (optional)" className="border border-hairline bg-white rounded-lg px-3 py-2 outline-none focus:border-action transition-colors" />
+        <textarea name="description" placeholder="Description (optional)" className="border border-hairline bg-white rounded-lg px-3 py-2 outline-none focus:border-action transition-colors min-h-[100px]" />
         {actionData && "error" in actionData && <p className="text-red-600 text-sm">{actionData.error}</p>}
-        <button type="submit" className="bg-black text-white rounded px-3 py-2 w-fit">
+        <button type="submit" className="bg-action text-white rounded-lg px-4 py-2 w-fit font-medium hover:bg-action-focus transition-colors">
           Add
         </button>
       </Form>
 
       <table className="w-full text-sm border-collapse">
         <thead>
-          <tr className="text-left border-b">
+          <tr className="text-left border-b border-hairline">
             <th className="py-2">Vehicle model &amp; color</th>
             <th className="py-2">Qty required</th>
             <th className="py-2">Status</th>
@@ -60,7 +60,7 @@ export default function Requirements({ loaderData, actionData }: Route.Component
         </thead>
         <tbody>
           {loaderData.requirements.map((r) => (
-            <tr key={r.id} className="border-b align-top">
+            <tr key={r.id} className="border-b border-hairline align-top">
               <td className="py-2">
                 {r.title}
                 {r.color && ` — ${r.color}`}
