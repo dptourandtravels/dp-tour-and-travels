@@ -48,8 +48,21 @@ const FINANCE_NAV: NavGroup[] = [
   },
 ];
 
+const CLIENT_NAV: NavGroup[] = [
+  {
+    label: "Overview",
+    items: [
+      { to: "/client", label: "Dashboard", end: true },
+      { to: "/client/your-cars", label: "Your Cars" },
+      { to: "/client/documents", label: "Documents" },
+      { to: "/client/agreements", label: "Agreements" },
+    ],
+  },
+];
+
 export function getNavGroups(role: Role): NavGroup[] {
   if (role === "superadmin") return SUPERADMIN_NAV;
   if (role === "finance") return FINANCE_NAV;
+  if (role === "client") return CLIENT_NAV;
   return [];
 }

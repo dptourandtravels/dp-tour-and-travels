@@ -1,5 +1,5 @@
-import { useState, type ReactNode } from "react";
 import { Form, Link, NavLink } from "react-router";
+import { useState, type ReactNode } from "react";
 import type { NavGroup } from "../lib/admin-nav";
 
 function NavGroups({ groups, onNavigate }: { groups: NavGroup[]; onNavigate?: () => void }) {
@@ -38,7 +38,7 @@ export function SidebarShell({
   navGroups,
   children,
 }: {
-  user: { name: string; email: string };
+  user: { name: string; email: string; role?: string };
   navGroups: NavGroup[];
   children: ReactNode;
 }) {
@@ -48,10 +48,22 @@ export function SidebarShell({
     <div className="min-h-screen flex bg-canvas-parchment font-sans text-ink">
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-72 shrink-0 flex-col border-r border-hairline bg-surface-pearl px-4 py-6">
-        <Link to="/" className="flex items-center gap-2 text-ink px-3 mb-8">
-          <img src="/dp-logo-mark.png" alt="" className="w-7 h-7 object-contain shrink-0" />
-          <span className="text-tagline whitespace-nowrap">DP Tour &amp; Travels</span>
-        </Link>
+        {user.role === 'client' ? (
+          <div className="flex items-center gap-3 px-3 mb-8">
+            <div className="w-10 h-10 rounded-full bg-action/10 text-action flex items-center justify-center font-bold text-lg shrink-0">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-ink truncate">{user.name}</p>
+              <p className="text-xs text-ink-muted-48 truncate">Client Portal</p>
+            </div>
+          </div>
+        ) : (
+          <Link to="/" className="flex items-center gap-2 text-ink px-3 mb-8">
+            <img src="/dp-logo-mark.png" alt="" className="w-7 h-7 object-contain shrink-0" />
+            <span className="text-tagline whitespace-nowrap">DP Tour &amp; Travels</span>
+          </Link>
+        )}
 
         <div className="flex-1 overflow-y-auto">
           <NavGroups groups={navGroups} />
@@ -70,10 +82,19 @@ export function SidebarShell({
 
       {/* Mobile top bar */}
       <div className="md:hidden fixed top-0 inset-x-0 z-40 flex items-center justify-between h-14 px-4 bg-[rgba(245,245,247,0.8)] backdrop-blur-xl border-b border-black/[0.08]">
-        <Link to="/" className="flex items-center gap-2 text-ink">
-          <img src="/dp-logo-mark.png" alt="" className="w-6 h-6 object-contain shrink-0" />
-          <span className="text-tagline text-base whitespace-nowrap">DP Tour &amp; Travels</span>
-        </Link>
+        {user.role === 'client' ? (
+          <div className="flex items-center gap-2 text-ink">
+            <div className="w-7 h-7 rounded-full bg-action/10 text-action flex items-center justify-center font-bold text-sm shrink-0">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
+            <span className="text-tagline text-base whitespace-nowrap truncate max-w-[150px]">{user.name}</span>
+          </div>
+        ) : (
+          <Link to="/" className="flex items-center gap-2 text-ink">
+            <img src="/dp-logo-mark.png" alt="" className="w-6 h-6 object-contain shrink-0" />
+            <span className="text-tagline text-base whitespace-nowrap">DP Tour &amp; Travels</span>
+          </Link>
+        )}
         <button
           type="button"
           onClick={() => setMobileNavOpen(true)}

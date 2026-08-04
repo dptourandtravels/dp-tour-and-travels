@@ -9,7 +9,10 @@ export default [
   route("reset-password/:token", "routes/reset-password.tsx"),
   route("finance", "routes/finance.tsx"),
   route("client", "routes/client.tsx"),
+  route("client/your-cars", "routes/client.your-cars.tsx"),
+  route("client/documents", "routes/client.documents.tsx"),
   route("client/documents/:docType", "routes/client.documents.$docType.tsx"),
+  route("client/agreements", "routes/client.agreements.tsx"),
   route("dealer", "routes/dealer.tsx"),
   route("superadmin", "routes/superadmin/layout.tsx", [
     index("routes/superadmin/dashboard.tsx"),
