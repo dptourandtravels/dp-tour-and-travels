@@ -1,9 +1,7 @@
-import { useState, type FormEvent } from "react";
-import { data, Link, redirect } from "react-router";
+import { data, Form, Link, redirect } from "react-router";
 import type { Route } from "./+types/get-started";
 import { createSession, getSessionUser, signUpClient, dashboardPathForRole } from "../lib/auth.server";
 import { type Role } from "../db/schema";
-import { DemoPopup } from "../components/demo-popup";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Get Started — DP Tour & Travels" }];
@@ -38,16 +36,7 @@ export async function action({ request }: Route.ActionArgs) {
   return redirect("/client", { headers: { "Set-Cookie": cookie } });
 }
 
-export default function GetStarted(_: Route.ComponentProps) {
-  const [popup, setPopup] = useState<{ name: string } | null>(null);
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const name = String(form.get("name") ?? "");
-    setPopup({ name });
-  }
-
+export default function GetStarted({ actionData }: Route.ComponentProps) {
   return (
     <div className="min-h-screen flex flex-col bg-canvas-parchment font-sans">
       {/* Simple Minimal Nav */}
@@ -74,7 +63,10 @@ export default function GetStarted(_: Route.ComponentProps) {
           </div>
 
           <div className="bg-white border border-hairline rounded-[18px] p-8 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <Form method="post" className="flex flex-col gap-5">
+              {actionData?.error && (
+                <p className="text-sm text-red-600">{actionData.error}</p>
+              )}
               <label className="flex flex-col gap-2">
                 <span className="text-label-sm text-ink font-medium">Full name</span>
                 <input
@@ -115,7 +107,7 @@ export default function GetStarted(_: Route.ComponentProps) {
               >
                 Create account
               </button>
-            </form>
+            </Form>
 
             <div className="mt-8 pt-6 border-t border-hairline text-center">
               <p className="text-sm text-ink-muted-80 mb-2">
@@ -133,15 +125,6 @@ export default function GetStarted(_: Route.ComponentProps) {
             </div>
           </div>
         </div>
-
-        {popup && (
-          <DemoPopup
-            ok
-            title="Signup is working"
-            message={`Thanks, ${popup.name}! Your account request has been received.`}
-            onClose={() => setPopup(null)}
-          />
-        )}
       </div>
     </div>
   );
