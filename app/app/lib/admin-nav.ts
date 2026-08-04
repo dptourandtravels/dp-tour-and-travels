@@ -57,6 +57,7 @@ const CLIENT_NAV: NavGroup[] = [
       { to: "/client/documents", label: "Documents" },
       { to: "/client/agreements", label: "Agreements" },
       { to: "/notifications", label: "Notifications" },
+      { to: "/client/profile", label: "Profile" },
     ],
   },
 ];

@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, uniqueIndex, index } from "drizzle-orm/sqlite-core";
 
 export const roles = ["superadmin", "finance", "client", "dealer"] as const;
 export type Role = (typeof roles)[number];
@@ -9,6 +9,7 @@ export const users = sqliteTable("users", {
   name: text("name").notNull(),
   role: text("role", { enum: roles }).notNull(),
   passwordHash: text("password_hash").notNull(),
+  profilePictureR2Key: text("profile_picture_r2_key"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
@@ -30,20 +31,24 @@ export const passwordResetTokens = sqliteTable("password_reset_tokens", {
   usedAt: integer("used_at", { mode: "timestamp" }),
 });
 
-export const cars = sqliteTable("cars", {
-  id: text("id").primaryKey(),
-  clientId: text("client_id")
-    .notNull()
-    .references(() => users.id),
-  make: text("make").notNull(),
-  model: text("model").notNull(),
-  registrationNumber: text("registration_number").notNull().unique(),
-  receiptDate: integer("receipt_date", { mode: "timestamp" }).notNull(),
-  dealerId: text("dealer_id").references(() => users.id),
-  leaseStartDate: integer("lease_start_date", { mode: "timestamp" }),
-  leaseEndDate: integer("lease_end_date", { mode: "timestamp" }),
-  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-});
+export const cars = sqliteTable(
+  "cars",
+  {
+    id: text("id").primaryKey(),
+    clientId: text("client_id")
+      .notNull()
+      .references(() => users.id),
+    make: text("make").notNull(),
+    model: text("model").notNull(),
+    registrationNumber: text("registration_number").notNull().unique(),
+    receiptDate: integer("receipt_date", { mode: "timestamp" }).notNull(),
+    dealerId: text("dealer_id").references(() => users.id),
+    leaseStartDate: integer("lease_start_date", { mode: "timestamp" }),
+    leaseEndDate: integer("lease_end_date", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  },
+  (table) => [index("cars_client_id_idx").on(table.clientId), index("cars_dealer_id_idx").on(table.dealerId)],
+);
 
 export const paymentStatuses = ["green", "red"] as const;
 export type PaymentStatus = (typeof paymentStatuses)[number];
@@ -51,18 +56,22 @@ export type PaymentStatus = (typeof paymentStatuses)[number];
 export const paymentMethods = ["cash", "upi", "bank_transfer", "cheque"] as const;
 export type PaymentMethod = (typeof paymentMethods)[number];
 
-export const payments = sqliteTable("payments", {
-  id: text("id").primaryKey(),
-  carId: text("car_id")
-    .notNull()
-    .references(() => cars.id),
-  amount: integer("amount").notNull(),
-  dueDate: integer("due_date", { mode: "timestamp" }).notNull(),
-  status: text("status", { enum: paymentStatuses }).notNull(),
-  method: text("method", { enum: paymentMethods }),
-  paidAt: integer("paid_at", { mode: "timestamp" }),
-  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-});
+export const payments = sqliteTable(
+  "payments",
+  {
+    id: text("id").primaryKey(),
+    carId: text("car_id")
+      .notNull()
+      .references(() => cars.id),
+    amount: integer("amount").notNull(),
+    dueDate: integer("due_date", { mode: "timestamp" }).notNull(),
+    status: text("status", { enum: paymentStatuses }).notNull(),
+    method: text("method", { enum: paymentMethods }),
+    paidAt: integer("paid_at", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  },
+  (table) => [index("payments_car_id_idx").on(table.carId)],
+);
 
 export const auditLog = sqliteTable("audit_log", {
   id: text("id").primaryKey(),
@@ -85,18 +94,22 @@ export const notificationTypes = [
 ] as const;
 export type NotificationType = (typeof notificationTypes)[number];
 
-export const notifications = sqliteTable("notifications", {
-  id: text("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id),
-  type: text("type", { enum: notificationTypes }).notNull(),
-  entityType: text("entity_type").notNull(),
-  entityId: text("entity_id").notNull(),
-  message: text("message").notNull(),
-  readAt: integer("read_at", { mode: "timestamp" }),
-  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-});
+export const notifications = sqliteTable(
+  "notifications",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id),
+    type: text("type", { enum: notificationTypes }).notNull(),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    message: text("message").notNull(),
+    readAt: integer("read_at", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  },
+  (table) => [index("notifications_user_id_idx").on(table.userId)],
+);
 
 export const agreements = sqliteTable("agreements", {
   id: text("id").primaryKey(),

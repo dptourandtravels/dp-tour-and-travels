@@ -13,6 +13,8 @@ export default [
   route("client/documents", "routes/client.documents.tsx"),
   route("client/documents/:docType", "routes/client.documents.$docType.tsx"),
   route("client/agreements", "routes/client.agreements.tsx"),
+  route("client/profile", "routes/client.profile.tsx"),
+  route("client/profile/picture", "routes/client.profile.picture.tsx"),
   route("dealer", "routes/dealer.tsx"),
   route("superadmin", "routes/superadmin/layout.tsx", [
     index("routes/superadmin/dashboard.tsx"),

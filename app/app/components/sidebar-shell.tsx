@@ -38,7 +38,7 @@ export function SidebarShell({
   navGroups,
   children,
 }: {
-  user: { name: string; email: string; role?: string };
+  user: { name: string; email: string; role?: string; profilePictureR2Key?: string | null };
   navGroups: NavGroup[];
   children: ReactNode;
 }) {
@@ -50,8 +50,12 @@ export function SidebarShell({
       <aside className="hidden md:flex w-72 shrink-0 flex-col border-r border-hairline bg-surface-pearl px-4 py-6">
         {user.role === 'client' ? (
           <div className="flex items-center gap-3 px-3 mb-8">
-            <div className="w-10 h-10 rounded-full bg-action/10 text-action flex items-center justify-center font-bold text-lg shrink-0">
-              {user.name.charAt(0).toUpperCase()}
+            <div className="w-10 h-10 rounded-full bg-action/10 text-action flex items-center justify-center font-bold text-lg shrink-0 overflow-hidden">
+              {user.profilePictureR2Key ? (
+                <img src="/client/profile/picture" alt="" className="w-full h-full object-cover" />
+              ) : (
+                user.name.charAt(0).toUpperCase()
+              )}
             </div>
             <div className="min-w-0">
               <p className="text-sm font-semibold text-ink truncate">{user.name}</p>
@@ -84,8 +88,12 @@ export function SidebarShell({
       <div className="md:hidden fixed top-0 inset-x-0 z-40 flex items-center justify-between h-14 px-4 bg-[rgba(245,245,247,0.8)] backdrop-blur-xl border-b border-black/[0.08]">
         {user.role === 'client' ? (
           <div className="flex items-center gap-2 text-ink">
-            <div className="w-7 h-7 rounded-full bg-action/10 text-action flex items-center justify-center font-bold text-sm shrink-0">
-              {user.name.charAt(0).toUpperCase()}
+            <div className="w-7 h-7 rounded-full bg-action/10 text-action flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden">
+              {user.profilePictureR2Key ? (
+                <img src="/client/profile/picture" alt="" className="w-full h-full object-cover" />
+              ) : (
+                user.name.charAt(0).toUpperCase()
+              )}
             </div>
             <span className="text-tagline text-base whitespace-nowrap truncate max-w-[150px]">{user.name}</span>
           </div>

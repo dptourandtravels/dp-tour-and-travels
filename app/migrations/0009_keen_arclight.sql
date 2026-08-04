@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD `profile_picture_r2_key` text;

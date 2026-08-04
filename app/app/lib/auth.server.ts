@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { eq } from "drizzle-orm";
 import { redirect } from "react-router";
 import { users, sessions, type Role } from "../db/schema";
-import { randomHex, hashPassword, generatePassword } from "./crypto";
+import { randomHex, hashPassword, verifyPassword, generatePassword } from "./crypto";
 import { dashboardPathForRole } from "./roles";
 
 export { verifyPassword, sha256Hex, hashPassword, generatePassword } from "./crypto";
@@ -19,6 +19,7 @@ export const publicUserColumns = {
   email: users.email,
   name: users.name,
   role: users.role,
+  profilePictureR2Key: users.profilePictureR2Key,
   createdAt: users.createdAt,
 } as const;
 
@@ -131,6 +132,42 @@ export async function getOrCreateClient(email: string, name: string) {
 
   const { user, password } = await insertUser(normalizedEmail, name.trim(), "client");
   return { user: toPublicUser(user), password };
+}
+
+export async function updateUserProfile(userId: string, input: { name: string; email: string }) {
+  const email = input.email.trim().toLowerCase();
+  const name = input.name.trim();
+  if (!email || !name) return { error: "missing/invalid field" as const };
+
+  const existing = await findUserByEmail(email);
+  if (existing && existing.id !== userId) return { error: "already exists" as const };
+
+  await db.update(users).set({ name, email }).where(eq(users.id, userId));
+  return { success: true as const };
+}
+
+export async function updateUserPassword(userId: string, currentPassword: string, newPassword: string) {
+  if (newPassword.length < 8) return { error: "Password must be at least 8 characters." as const };
+
+  const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  if (!user || !(await verifyPassword(currentPassword, user.passwordHash))) {
+    return { error: "Current password is incorrect." as const };
+  }
+
+  await db.update(users).set({ passwordHash: await hashPassword(newPassword) }).where(eq(users.id, userId));
+  return { success: true as const };
+}
+
+export async function uploadProfilePicture(userId: string, file: File) {
+  const key = `profile-pictures/${userId}`;
+  await env.DOCUMENTS.put(key, await file.arrayBuffer(), {
+    httpMetadata: { contentType: file.type || "application/octet-stream" },
+  });
+  await db.update(users).set({ profilePictureR2Key: key }).where(eq(users.id, userId));
+}
+
+export async function getProfilePicture(r2Key: string) {
+  return env.DOCUMENTS.get(r2Key);
 }
 
 export async function signUpClient(input: { email: string; name: string; password: string }) {
