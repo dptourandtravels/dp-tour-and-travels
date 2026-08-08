@@ -21,7 +21,7 @@ function sqlEscape(value) {
 const password = generatePassword();
 const id = crypto.randomUUID();
 const passwordHash = await hashPassword(password);
-const createdAt = Date.now();
+const createdAt = Math.floor(Date.now() / 1000); // seconds — column is integer({mode:"timestamp"})
 
 const sql = `INSERT INTO users (id, email, name, role, password_hash, created_at) VALUES ('${sqlEscape(
   id,

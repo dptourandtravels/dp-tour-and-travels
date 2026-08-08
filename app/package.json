@@ -13,7 +13,10 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply dp-tour-travels-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply dp-tour-travels-db --remote",
-    "db:reset:local": "node -e \"try{require('fs').rmSync('.wrangler/state/v3/d1',{recursive:true,force:true})}catch(e){console.error('Could not reset local D1 - stop npm run dev first (it holds the D1 file open), then retry.');process.exit(1)}\" && npm run db:migrate:local"
+    "db:reset:local": "node -e \"try{require('fs').rmSync('.wrangler/state/v3/d1',{recursive:true,force:true})}catch(e){console.error('Could not reset local D1 - stop npm run dev first (it holds the D1 file open), then retry.');process.exit(1)}\" && npm run db:migrate:local && npm run db:seed",
+    "db:seed": "node scripts/seed-dev.mjs",
+    "db:status": "wrangler d1 migrations list dp-tour-travels-db --remote",
+    "ship": "npm run db:migrate:remote && git push"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",
