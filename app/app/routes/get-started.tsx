@@ -17,7 +17,7 @@ export async function action({ request }: Route.ActionArgs) {
   const form = await request.formData();
   const name = String(form.get("name") ?? "");
   const email = String(form.get("email") ?? "");
-  const password = String(form.get("password") ?? "");
+  const password = String(form.get("password") ?? "").trim();
 
   if (password.length < 8) {
     return data({ error: "Password must be at least 8 characters." }, { status: 400 });

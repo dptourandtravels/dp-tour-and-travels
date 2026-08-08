@@ -16,7 +16,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 export async function action({ request }: Route.ActionArgs) {
   const form = await request.formData();
   const email = String(form.get("email") ?? "").trim().toLowerCase();
-  const password = String(form.get("password") ?? "");
+  const password = String(form.get("password") ?? "").trim();
 
   const user = await findUserByEmail(email);
   if (!user || !(await verifyPassword(password, user.passwordHash))) {
@@ -66,6 +66,10 @@ export default function Login({ actionData }: Route.ComponentProps) {
                   name="email"
                   type="text"
                   required
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   className="text-body-apple text-ink border border-hairline rounded-[11px] px-4 py-[11px] bg-surface-pearl focus:outline-none focus:ring-2 focus:ring-action/30 focus:border-action transition-all"
                 />
               </label>
@@ -76,6 +80,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
                   name="password"
                   type="password"
                   required
+                  autoComplete="current-password"
                   className="text-body-apple text-ink border border-hairline rounded-[11px] px-4 py-[11px] bg-surface-pearl focus:outline-none focus:ring-2 focus:ring-action/30 focus:border-action transition-all"
                 />
               </label>

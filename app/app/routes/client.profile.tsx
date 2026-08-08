@@ -29,8 +29,8 @@ export async function action({ request }: Route.ActionArgs) {
   if (intent === "change_password") {
     const result = await updateUserPassword(
       user.id,
-      String(form.get("currentPassword") ?? ""),
-      String(form.get("newPassword") ?? ""),
+      String(form.get("currentPassword") ?? "").trim(),
+      String(form.get("newPassword") ?? "").trim(),
     );
     if ("error" in result) {
       return data({ intent, error: result.error }, { status: 400 });
