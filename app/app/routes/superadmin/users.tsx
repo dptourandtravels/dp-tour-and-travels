@@ -5,7 +5,7 @@ import { requireUser, db, updateUserRole, publicUserColumns } from "../../lib/au
 import { users, roles, type Role } from "../../db/schema";
 import { logAudit } from "../../lib/audit.server";
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check, CheckCircle2, AlertCircle } from "lucide-react";
 
 export async function loader({ request }: Route.LoaderArgs) {
   await requireUser(request, ["superadmin"]);
@@ -26,22 +26,24 @@ export async function action({ request }: Route.ActionArgs) {
   const [target] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
   if (!target) return data({ error: "User not found." }, { status: 404 });
 
-  if (target.role !== role) {
-    await updateUserRole(userId, role);
-    await logAudit({
-      entityType: "user",
-      entityId: userId,
-      action: "role_change",
-      actorUserId: actor.id,
-      before: { role: target.role },
-      after: { role },
-    });
+  if (target.role === role) {
+    return data({ unchanged: true as const, name: target.name, role });
   }
 
-  return data({ success: true as const });
+  await updateUserRole(userId, role);
+  await logAudit({
+    entityType: "user",
+    entityId: userId,
+    action: "role_change",
+    actorUserId: actor.id,
+    before: { role: target.role },
+    after: { role },
+  });
+
+  return data({ success: true as const, name: target.name, role });
 }
 
-function UserRow({ user, availableRoles }: { user: any, availableRoles: string[] }) {
+function UserRow({ user, availableRoles }: { user: any, availableRoles: readonly string[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState(user.role);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -118,9 +120,55 @@ function UserRow({ user, availableRoles }: { user: any, availableRoles: string[]
   );
 }
 
-export default function UsersList({ loaderData }: Route.ComponentProps) {
+function Toast({ actionData }: { actionData: Route.ComponentProps["actionData"] }) {
+  const [message, setMessage] = useState<{ text: string; kind: "success" | "error" } | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (!actionData) return;
+    if ("success" in actionData) {
+      setMessage({ text: `${actionData.name} is now a ${actionData.role}.`, kind: "success" });
+    } else if ("unchanged" in actionData) {
+      setMessage({ text: `${actionData.name} is already a ${actionData.role}.`, kind: "success" });
+    } else if ("error" in actionData) {
+      setMessage({ text: actionData.error, kind: "error" });
+    } else {
+      return;
+    }
+    const raf = requestAnimationFrame(() => setVisible(true));
+    const hide = setTimeout(() => setVisible(false), 3200);
+    const clear = setTimeout(() => setMessage(null), 3500);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(hide);
+      clearTimeout(clear);
+    };
+  }, [actionData]);
+
+  if (!message) return null;
+
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className={`fixed bottom-10 left-1/2 z-50 flex items-center gap-4 rounded-2xl bg-white px-6 py-4 shadow-2xl ring-1 ring-gray-900/10 text-base font-medium text-gray-900 transition-all duration-300 ease-out motion-reduce:transition-none ${
+        visible ? "opacity-100 translate-y-0 -translate-x-1/2" : "opacity-0 translate-y-4 -translate-x-1/2"
+      }`}
+    >
+      {message.kind === "success" ? (
+        <CheckCircle2 className="h-6 w-6 text-green-600 shrink-0" />
+      ) : (
+        <AlertCircle className="h-6 w-6 text-red-600 shrink-0" />
+      )}
+      <span className="capitalize">{message.text}</span>
+    </div>
+  );
+}
+
+export default function UsersList({ loaderData, actionData }: Route.ComponentProps) {
   return (
     <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl overflow-hidden">
+      <Toast actionData={actionData} />
       <div className="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
         <h2 className="text-base font-semibold leading-6 text-gray-900">Manage Users</h2>
         <p className="text-sm text-gray-500">Update roles for all registered users in the system.</p>
