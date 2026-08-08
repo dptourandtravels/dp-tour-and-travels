@@ -1,6 +1,9 @@
 import { sqliteTable, text, integer, uniqueIndex, index } from "drizzle-orm/sqlite-core";
 
-export const roles = ["superadmin", "finance", "client", "dealer"] as const;
+// "user" is the default role for public self-signups: no portal access until a superadmin
+// assigns a real role from the users dashboard. Stored as plain text (no DB CHECK), so adding
+// it here needs no migration.
+export const roles = ["superadmin", "finance", "client", "dealer", "user"] as const;
 export type Role = (typeof roles)[number];
 
 export const users = sqliteTable("users", {

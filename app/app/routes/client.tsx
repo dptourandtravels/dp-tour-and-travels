@@ -8,7 +8,7 @@ import { listDocumentsForClient } from "../lib/documents.server";
 import { listAgreementsForParty } from "../lib/agreements.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const user = await requireUser(request, ["client"]);
+  const user = await requireUser(request, ["client", "user"]);
   const [cars, documents, agreements] = await Promise.all([
     listCarsForClient(user.id),
     listDocumentsForClient(user.id),

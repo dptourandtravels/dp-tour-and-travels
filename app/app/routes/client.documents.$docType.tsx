@@ -4,7 +4,7 @@ import { getDocumentForDownload, documentTypes } from "../lib/documents.server";
 import type { DocumentType } from "../db/schema";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const user = await requireUser(request, ["client"]);
+  const user = await requireUser(request, ["client", "user"]);
   if (!documentTypes.includes(params.docType as DocumentType)) {
     throw new Response("Not found", { status: 404 });
   }

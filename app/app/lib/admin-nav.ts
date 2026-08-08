@@ -65,6 +65,6 @@ const CLIENT_NAV: NavGroup[] = [
 export function getNavGroups(role: Role): NavGroup[] {
   if (role === "superadmin") return SUPERADMIN_NAV;
   if (role === "finance") return FINANCE_NAV;
-  if (role === "client") return CLIENT_NAV;
+  if (role === "client" || role === "user") return CLIENT_NAV;
   return [];
 }

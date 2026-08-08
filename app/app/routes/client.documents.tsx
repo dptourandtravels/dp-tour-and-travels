@@ -17,13 +17,13 @@ const docLabels: Record<DocumentType, string> = {
 };
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const user = await requireUser(request, ["client"]);
+  const user = await requireUser(request, ["client", "user"]);
   const documents = await listDocumentsForClient(user.id);
   return { user, documents };
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  const user = await requireUser(request, ["client"]);
+  const user = await requireUser(request, ["client", "user"]);
   const form = await request.formData();
   const docType = String(form.get("docType") ?? "");
   const file = form.get("file");

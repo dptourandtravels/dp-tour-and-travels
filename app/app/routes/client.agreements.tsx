@@ -5,7 +5,7 @@ import { getNavGroups } from "../lib/admin-nav";
 import { listAgreementsForParty } from "../lib/agreements.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const user = await requireUser(request, ["client"]);
+  const user = await requireUser(request, ["client", "user"]);
   const agreements = await listAgreementsForParty(user.id);
   return { user, agreements };
 }

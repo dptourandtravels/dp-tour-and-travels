@@ -47,8 +47,8 @@ export function SidebarShell({
   return (
     <div className="min-h-screen flex bg-canvas-parchment font-sans text-ink">
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-72 shrink-0 flex-col border-r border-hairline bg-surface-pearl px-4 py-6">
-        {user.role === 'client' ? (
+      <aside className="hidden md:flex w-72 shrink-0 flex-col border-r border-hairline bg-surface-pearl px-4 py-6 sticky top-0 h-screen">
+        {user.role === 'client' || user.role === 'user' ? (
           <div className="flex items-center gap-3 px-3 mb-8">
             <div className="w-10 h-10 rounded-full bg-action/10 text-action flex items-center justify-center font-bold text-lg shrink-0 overflow-hidden">
               {user.profilePictureR2Key ? (
@@ -86,7 +86,7 @@ export function SidebarShell({
 
       {/* Mobile top bar */}
       <div className="md:hidden fixed top-0 inset-x-0 z-40 flex items-center justify-between h-14 px-4 bg-[rgba(245,245,247,0.8)] backdrop-blur-xl border-b border-black/[0.08]">
-        {user.role === 'client' ? (
+        {user.role === 'client' || user.role === 'user' ? (
           <div className="flex items-center gap-2 text-ink">
             <div className="w-7 h-7 rounded-full bg-action/10 text-action flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden">
               {user.profilePictureR2Key ? (

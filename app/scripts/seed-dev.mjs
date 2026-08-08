@@ -23,6 +23,7 @@ const U = {
   finance: "00000000-0000-4000-8000-000000000002",
   client: "00000000-0000-4000-8000-000000000003",
   dealer: "00000000-0000-4000-8000-000000000004",
+  user: "00000000-0000-4000-8000-000000000005",
 };
 const CAR = {
   a: "00000000-0000-4000-8000-0000000000a1",
@@ -61,7 +62,8 @@ INSERT INTO users (id, email, name, role, password_hash, created_at) VALUES
   ${userRow(U.superadmin, "superadmin@dev.local", "Dev Superadmin", "superadmin")},
   ${userRow(U.finance, "finance@dev.local", "Dev Finance", "finance")},
   ${userRow(U.client, "client@dev.local", "Dev Client", "client")},
-  ${userRow(U.dealer, "dealer@dev.local", "Dev Dealer", "dealer")}
+  ${userRow(U.dealer, "dealer@dev.local", "Dev Dealer", "dealer")},
+  ${userRow(U.user, "user@dev.local", "Dev User", "user")}
 ON CONFLICT(id) DO UPDATE SET
   email = excluded.email, name = excluded.name, role = excluded.role, password_hash = excluded.password_hash;
 
@@ -104,5 +106,5 @@ try {
   unlinkSync(sqlFile);
 }
 
-console.log(`\nSeeded 4 accounts (password: ${PASSWORD}):`);
-console.log("  superadmin@dev.local  finance@dev.local  client@dev.local  dealer@dev.local\n");
+console.log(`\nSeeded 5 accounts (password: ${PASSWORD}):`);
+console.log("  superadmin@dev.local  finance@dev.local  client@dev.local  dealer@dev.local  user@dev.local\n");

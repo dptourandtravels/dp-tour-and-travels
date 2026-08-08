@@ -2,7 +2,7 @@ import type { Route } from "./+types/client.profile.picture";
 import { requireUser, getProfilePicture } from "../lib/auth.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const user = await requireUser(request, ["client"]);
+  const user = await requireUser(request, ["client", "user"]);
   if (!user.profilePictureR2Key) throw new Response("Not found", { status: 404 });
 
   const object = await getProfilePicture(user.profilePictureR2Key);

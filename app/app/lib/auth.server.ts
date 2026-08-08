@@ -170,7 +170,9 @@ export async function getProfilePicture(r2Key: string) {
   return env.DOCUMENTS.get(r2Key);
 }
 
-export async function signUpClient(input: { email: string; name: string; password: string }) {
+// Public self-signup. Creates a role-less "user" account; a superadmin assigns the real role later.
+// (Staff-onboarded clients are created as "client" via getOrCreateClient, not here.)
+export async function signUpUser(input: { email: string; name: string; password: string }) {
   const email = input.email.trim().toLowerCase();
   const name = input.name.trim();
   const password = input.password;
@@ -188,7 +190,7 @@ export async function signUpClient(input: { email: string; name: string; passwor
     id: crypto.randomUUID(),
     email,
     name,
-    role: "client" as const,
+    role: "user" as const,
     passwordHash: await hashPassword(password),
     createdAt: new Date(),
   };

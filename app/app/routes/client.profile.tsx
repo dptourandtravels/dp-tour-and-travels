@@ -5,12 +5,12 @@ import { SidebarShell } from "../components/sidebar-shell";
 import { getNavGroups } from "../lib/admin-nav";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const user = await requireUser(request, ["client"]);
+  const user = await requireUser(request, ["client", "user"]);
   return { user };
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  const user = await requireUser(request, ["client"]);
+  const user = await requireUser(request, ["client", "user"]);
   const form = await request.formData();
   const intent = String(form.get("intent") ?? "");
 

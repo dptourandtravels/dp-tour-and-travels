@@ -1,6 +1,6 @@
 import { data, Form, Link, redirect } from "react-router";
 import type { Route } from "./+types/get-started";
-import { createSession, getSessionUser, signUpClient, dashboardPathForRole } from "../lib/auth.server";
+import { createSession, getSessionUser, signUpUser, dashboardPathForRole } from "../lib/auth.server";
 import { type Role } from "../db/schema";
 
 export function meta({}: Route.MetaArgs) {
@@ -23,7 +23,7 @@ export async function action({ request }: Route.ActionArgs) {
     return data({ error: "Password must be at least 8 characters." }, { status: 400 });
   }
 
-  const result = await signUpClient({ name, email, password });
+  const result = await signUpUser({ name, email, password });
   if ("error" in result) {
     const message =
       result.error === "already exists"
@@ -33,7 +33,7 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
   const { cookie } = await createSession(result.user.id);
-  return redirect("/client", { headers: { "Set-Cookie": cookie } });
+  return redirect(dashboardPathForRole(result.user.role), { headers: { "Set-Cookie": cookie } });
 }
 
 export default function GetStarted({ actionData }: Route.ComponentProps) {

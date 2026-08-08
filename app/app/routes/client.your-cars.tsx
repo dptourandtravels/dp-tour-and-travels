@@ -5,7 +5,7 @@ import { getNavGroups } from "../lib/admin-nav";
 import { listCarsForClient } from "../lib/cars.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const user = await requireUser(request, ["client"]);
+  const user = await requireUser(request, ["client", "user"]);
   const cars = await listCarsForClient(user.id);
   return { user, cars };
 }
