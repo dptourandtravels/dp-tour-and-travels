@@ -35,3 +35,20 @@ export async function createCarRequirement(
 export async function closeCarRequirement(id: string) {
   await db.update(carRequirements).set({ status: "closed", closedAt: new Date() }).where(eq(carRequirements.id, id));
 }
+
+export async function reopenCarRequirement(id: string) {
+  await db.update(carRequirements).set({ status: "open", closedAt: null }).where(eq(carRequirements.id, id));
+}
+
+export async function updateCarRequirement(
+  id: string,
+  title: string,
+  description: string,
+  color: string,
+  quantity: number | null,
+) {
+  await db
+    .update(carRequirements)
+    .set({ title, description: description || null, color: color || null, quantity })
+    .where(eq(carRequirements.id, id));
+}

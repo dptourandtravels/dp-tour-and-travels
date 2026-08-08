@@ -1,7 +1,13 @@
 import { data, Form } from "react-router";
 import type { Route } from "./+types/requirements";
 import { requireUser } from "../../lib/auth.server";
-import { listAllCarRequirements, createCarRequirement, closeCarRequirement } from "../../lib/requirements.server";
+import {
+  listAllCarRequirements,
+  createCarRequirement,
+  closeCarRequirement,
+  reopenCarRequirement,
+  updateCarRequirement,
+} from "../../lib/requirements.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
   await requireUser(request, ["superadmin"]);
@@ -19,6 +25,12 @@ export async function action({ request }: Route.ActionArgs) {
     return data({ success: true as const });
   }
 
+  if (intent === "reopen") {
+    await reopenCarRequirement(String(form.get("id") ?? ""));
+    return data({ success: true as const });
+  }
+
+  // "create" and "edit" take the same fields, so they share the parsing and validation below.
   const title = String(form.get("title") ?? "").trim();
   const description = String(form.get("description") ?? "");
   const color = String(form.get("color") ?? "").trim();
@@ -30,6 +42,11 @@ export async function action({ request }: Route.ActionArgs) {
   if (quantityRaw && (!Number.isInteger(quantity) || quantity! <= 0)) {
     return data({ error: "Quantity must be a positive whole number." }, { status: 400 });
   }
+  if (intent === "edit") {
+    await updateCarRequirement(String(form.get("id") ?? ""), title, description, color, quantity);
+    return data({ success: true as const });
+  }
+
   await createCarRequirement(title, description, color, quantity);
   return data({ success: true as const });
 }
@@ -69,15 +86,43 @@ export default function Requirements({ loaderData, actionData }: Route.Component
               <td className="py-2">{r.quantity ?? "—"}</td>
               <td className="py-2">{r.status}</td>
               <td className="py-2">
-                {r.status === "open" && (
-                  <Form method="post">
-                    <input type="hidden" name="intent" value="close" />
+                <div className="flex items-start gap-6">
+                  <Form method="post" className="flex items-center" title={r.status === "open" ? "Close requirement" : "Reopen requirement"}>
+                    <input type="hidden" name="intent" value={r.status === "open" ? "close" : "reopen"} />
                     <input type="hidden" name="id" value={r.id} />
-                    <button type="submit" className="text-xs underline">
-                      Close
+                    <button
+                      type="submit"
+                      role="switch"
+                      aria-checked={r.status === "open"}
+                      className={`${
+                        r.status === "open" ? "bg-action" : "bg-gray-300"
+                      } relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-action focus:ring-offset-2`}
+                    >
+                      <span className="sr-only">Toggle status</span>
+                      <span
+                        aria-hidden="true"
+                        className={`${
+                          r.status === "open" ? "translate-x-4" : "translate-x-0"
+                        } pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+                      />
                     </button>
                   </Form>
-                )}
+
+                  <details className="mt-0.5">
+                    <summary className="text-xs underline cursor-pointer text-gray-600 hover:text-black transition-colors">Edit</summary>
+                    <Form method="post" className="flex flex-col gap-2 mt-2 min-w-[220px]">
+                      <input type="hidden" name="intent" value="edit" />
+                      <input type="hidden" name="id" value={r.id} />
+                      <input name="title" defaultValue={r.title} required className="text-xs border border-hairline bg-white rounded px-2 py-1 outline-none focus:border-action transition-colors" />
+                      <input name="color" defaultValue={r.color ?? ""} placeholder="Color (optional)" className="text-xs border border-hairline bg-white rounded px-2 py-1 outline-none focus:border-action transition-colors" />
+                      <input name="quantity" type="number" min="1" defaultValue={r.quantity ?? ""} placeholder="Qty (optional)" className="text-xs border border-hairline bg-white rounded px-2 py-1 outline-none focus:border-action transition-colors" />
+                      <textarea name="description" defaultValue={r.description ?? ""} placeholder="Description (optional)" className="text-xs border border-hairline bg-white rounded px-2 py-1 outline-none focus:border-action transition-colors min-h-[60px]" />
+                      <button type="submit" className="bg-action text-white rounded px-3 py-1 text-xs w-fit font-medium hover:bg-action-focus transition-colors">
+                        Save
+                      </button>
+                    </Form>
+                  </details>
+                </div>
               </td>
             </tr>
           ))}
