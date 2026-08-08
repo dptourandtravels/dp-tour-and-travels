@@ -4,6 +4,8 @@ import type { Route } from "./+types/users";
 import { requireUser, db, updateUserRole, publicUserColumns } from "../../lib/auth.server";
 import { users, roles, type Role } from "../../db/schema";
 import { logAudit } from "../../lib/audit.server";
+import { useState, useRef, useEffect } from "react";
+import { ChevronDown, Check } from "lucide-react";
 
 export async function loader({ request }: Route.LoaderArgs) {
   await requireUser(request, ["superadmin"]);
@@ -39,6 +41,83 @@ export async function action({ request }: Route.ActionArgs) {
   return data({ success: true as const });
 }
 
+function UserRow({ user, availableRoles }: { user: any, availableRoles: string[] }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState(user.role);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <tr className="hover:bg-gray-50/50 transition-colors">
+      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        {user.name}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        {user.email}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm">
+        <Form method="post" className="flex items-center gap-3">
+          <input type="hidden" name="userId" value={user.id} />
+          <input type="hidden" name="role" value={selectedRole} />
+          
+          <div className="relative" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => setIsOpen(!isOpen)}
+              className="relative w-36 cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-black sm:text-sm sm:leading-6 transition-all"
+            >
+              <span className="block truncate capitalize">{selectedRole}</span>
+              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                <ChevronDown className="h-4 w-4 text-gray-500" />
+              </span>
+            </button>
+
+            {isOpen && (
+              <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                {availableRoles.map((r) => (
+                  <li
+                    key={r}
+                    className={`relative cursor-default select-none py-2 pl-3 pr-9 ${
+                      selectedRole === r ? "bg-gray-100 text-gray-900 font-medium" : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                    }`}
+                    onClick={() => {
+                      setSelectedRole(r);
+                      setIsOpen(false);
+                    }}
+                  >
+                    <span className="block truncate capitalize">{r}</span>
+                    {selectedRole === r && (
+                      <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-black">
+                        <Check className="h-4 w-4" />
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <button 
+            type="submit" 
+            className="rounded-md bg-black px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black transition-colors"
+          >
+            Save
+          </button>
+        </Form>
+      </td>
+    </tr>
+  );
+}
+
 export default function UsersList({ loaderData }: Route.ComponentProps) {
   return (
     <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl overflow-hidden">
@@ -63,43 +142,7 @@ export default function UsersList({ loaderData }: Route.ComponentProps) {
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
             {loaderData.users.map((u) => (
-              <tr key={u.id} className="hover:bg-gray-50/50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {u.name}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {u.email}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <Form method="post" className="flex items-center gap-3">
-                    <input type="hidden" name="userId" value={u.id} />
-                    <div className="relative">
-                      <select 
-                        name="role" 
-                        defaultValue={u.role} 
-                        className="block w-36 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 bg-white shadow-sm appearance-none cursor-pointer"
-                      >
-                        {roles.map((r) => (
-                          <option key={r} value={r}>
-                            {r}
-                          </option>
-                        ))}
-                      </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                        <svg className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </div>
-                    <button 
-                      type="submit" 
-                      className="rounded-md bg-black px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black transition-colors"
-                    >
-                      Save
-                    </button>
-                  </Form>
-                </td>
-              </tr>
+              <UserRow key={u.id} user={u} availableRoles={roles} />
             ))}
           </tbody>
         </table>
